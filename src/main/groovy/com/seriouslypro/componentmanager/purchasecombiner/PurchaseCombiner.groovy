@@ -44,6 +44,7 @@ class PurchaseCombiner {
 
         String credentialsFileName = config.getOrDefault("credentials","credentials.json")
         String sheetId = config.getOrDefault("sheetId","")
+        String sourceDirectory = config.getOrDefault("sourceDirectory","")
 
         if (options.s) {
             sheetId = options.s
@@ -53,13 +54,12 @@ class PurchaseCombiner {
             credentialsFileName = options.c
         }
 
-        String sourceDirectory
         if (options.sd) {
             sourceDirectory = options.sd
         }
 
         if (options.u) {
-            boolean haveRequiredOptions = !sheetId.empty && sourceDirectory && !sourceDirectory.empty
+            boolean haveRequiredOptions = !sheetId.empty && !sourceDirectory.empty
 
             if (haveRequiredOptions) {
                 PurchaseCombinerGoogleSheetsUpdater updater = new PurchaseCombinerGoogleSheetsUpdater(

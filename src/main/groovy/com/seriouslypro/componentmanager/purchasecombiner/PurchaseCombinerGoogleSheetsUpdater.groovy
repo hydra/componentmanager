@@ -48,6 +48,8 @@ class PurchaseCombinerGoogleSheetsUpdater {
 
         new File(sourceDirectory).eachFileMatch(FileType.FILES, ~/.*\.csv/) { sourceFile ->
             PurchaseCSVProcessor purchaseCSVProcessor = new PurchaseCSVProcessor(
+                service: service,
+                spreadsheet: spreadsheet,
                 sheet: purchaseHistorySheet
             )
             purchaseCSVProcessor.process(sourceFile)
