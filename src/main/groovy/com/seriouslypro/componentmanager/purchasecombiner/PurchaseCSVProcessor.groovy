@@ -10,8 +10,9 @@ import com.google.api.services.sheets.v4.model.Sheet
 import com.google.api.services.sheets.v4.model.Spreadsheet
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse
 import com.google.api.services.sheets.v4.model.ValueRange
+import com.seriouslypro.componentmanager.purchase.lcsc.LCSCDataExtractor
 import com.seriouslypro.componentmanager.purchase.lcsc.LCSCPurchase
-import com.seriouslypro.componentmanager.purchase.lcsc.LCSCPurchasesCSVInput
+import com.seriouslypro.componentmanager.purchase.lcsc.LCSCPurchaseCSVInput
 import com.seriouslypro.csv.CSVInput
 import com.seriouslypro.csv.CSVInputContext
 import com.seriouslypro.googlesheets.GridRangeConverter
@@ -90,8 +91,8 @@ class PurchaseCSVProcessor {
             row[6] = purchase.manufacturer
             row[7] = purchase.description
             row[8] = purchase.quantity
-            row[9] = purchase.price * purchase.quantity
-            row[10] = purchase.price
+            row[9] = purchase.price
+            row[10] = purchase.price * purchase.quantity
             row[11] = purchase.currency.toString()
 
             rows << row
@@ -145,7 +146,7 @@ class PurchaseCSVProcessor {
     private ArrayList<LCSCPurchase> readPurchases(File sourceFile) {
         Reader reader = makeLCSCFileReader(sourceFile)
 
-        CSVInput csvInput = new LCSCPurchasesCSVInput(sourceFile.name, reader)
+        CSVInput csvInput = new LCSCPurchaseCSVInput(sourceFile.name, reader)
 
         csvInput.parseHeader()
 

@@ -9,8 +9,9 @@ class BOMCost {
     static Integer processArgs(String[] args) {
         CliBuilder builder = new CliBuilder(usage: 'bomcost')
         builder.v('version')
-        builder.p(args:1, argName: 'purchases', 'purhases file/url')
+        builder.p(args:1, argName: 'purchases', 'purchases file/url')
         builder.b(args:1, argName: 'bom', 'BOM file/url')
+        builder.pm(args:1, argName: 'partmappings', 'part mappings file/url')
         builder.cu(args:1, argName: 'currency', 'currency')
         builder.cfg(args:1, argName: 'config', 'configuration file (in "key=value" format)')
 
@@ -53,6 +54,10 @@ class BOMCost {
             bom = options.b
         }
 
+        String partMappings = config.getOrDefault("partmappings","partmappings.csv")
+        if (options.pm) {
+            partMappings = options.pm
+        }
         String currencyCode = config.getOrDefault("currency","USD")
         if (options.cu) {
             currencyCode = options.cu
@@ -68,9 +73,11 @@ class BOMCost {
                 BOMCostCalculator calculator = new BOMCostCalculator(
                     bomFileName: bom,
                     purchasesFileName: purchases,
+                    edaPartMappingsFileName: partMappings,
                     currency: currency,
                 )
-                calculator.calculate()
+                BOMCostResult result = calculator.calculate()
+                dumpBOMCostResult(result)
                 return 0
             }
         }
@@ -80,6 +87,10 @@ class BOMCost {
         System.out.println('invalid parameter combinations')
         builder.usage()
         return -1
+    }
+
+    static void dumpBOMCostResult(BOMCostResult bomCostResult) {
+        System.out.println("Cost: ${bomCostResult.cost} ${bomCostResult.currency}")
     }
 
     public static void main(String [] args) {

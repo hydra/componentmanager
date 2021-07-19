@@ -2,30 +2,13 @@ package com.seriouslypro.componentmanager.purchase.lcsc
 
 import com.seriouslypro.csv.*
 
-class RequiredHeadersVerifier {
-    static void verifyRequiredHeadersPresent(List<CSVColumn> requiredHeaders, Map<CSVColumn, CSVHeader> headerMap, String[] headerValues) {
+class LCSCPurchaseHeaderParser  implements CSVHeaderParser<LCSCPurchaseCSVHeaders> {
 
-        boolean haveRequiredHeaders = headerMap.keySet().containsAll(
-            requiredHeaders
-        )
-
-        if (!haveRequiredHeaders) {
-            String requiredHeadersString = requiredHeaders.collect {
-                it.name()
-            }.toArray().join(',')
-
-            throw new CSVInput.CSVParseException("Input CSV file does not contain all required headers, required: '$requiredHeadersString', found: '$headerValues'")
-        }
-    }
-}
-
-class LCSCPurchaseHeaderParser  implements CSVHeaderParser<LCSCPurchasesCSVHeaders> {
-
-    private Map<LCSCPurchasesCSVHeaders, CSVHeader> createHeaderMappings(CSVInputContext context, String[] headerValues) {
-        Map<LCSCPurchasesCSVHeaders, CSVHeader> headerMappings = [:]
+    private Map<LCSCPurchaseCSVHeaders, CSVHeader> createHeaderMappings(CSVInputContext context, String[] headerValues) {
+        Map<LCSCPurchaseCSVHeaders, CSVHeader> headerMappings = [:]
         headerValues.eachWithIndex { String headerValue, Integer index ->
             try {
-                LCSCPurchasesCSVHeaders LCSCPurchasesCSVHeader = parseHeader(context, headerValue)
+                LCSCPurchaseCSVHeaders LCSCPurchasesCSVHeader = parseHeader(context, headerValue)
                 CSVHeader csvHeader = new CSVHeader()
                 csvHeader.index = index
                 headerMappings[LCSCPurchasesCSVHeader] = csvHeader
@@ -37,16 +20,16 @@ class LCSCPurchaseHeaderParser  implements CSVHeaderParser<LCSCPurchasesCSVHeade
     }
 
     @Override
-    Map<LCSCPurchasesCSVHeaders, CSVHeader> parseHeaders(CSVInputContext context, String[] headerValues) {
-        Map<LCSCPurchasesCSVHeaders, CSVHeader> headerMappings = createHeaderMappings(context, headerValues)
+    Map<LCSCPurchaseCSVHeaders, CSVHeader> parseHeaders(CSVInputContext context, String[] headerValues) {
+        Map<LCSCPurchaseCSVHeaders, CSVHeader> headerMappings = createHeaderMappings(context, headerValues)
 
         def requiredHeaders = [
-            LCSCPurchasesCSVHeaders.PART,
-            LCSCPurchasesCSVHeaders.MANUFACTURER,
-            LCSCPurchasesCSVHeaders.MANUFACTURER_PART,
-            LCSCPurchasesCSVHeaders.DESCRIPTION,
-            LCSCPurchasesCSVHeaders.QUANTITY,
-            LCSCPurchasesCSVHeaders.PRICE,
+            LCSCPurchaseCSVHeaders.PART,
+            LCSCPurchaseCSVHeaders.MANUFACTURER,
+            LCSCPurchaseCSVHeaders.MANUFACTURER_PART,
+            LCSCPurchaseCSVHeaders.DESCRIPTION,
+            LCSCPurchaseCSVHeaders.QUANTITY,
+            LCSCPurchaseCSVHeaders.PRICE,
         ]
 
         RequiredHeadersVerifier.verifyRequiredHeadersPresent(requiredHeaders, headerMappings, headerValues)
@@ -55,8 +38,8 @@ class LCSCPurchaseHeaderParser  implements CSVHeaderParser<LCSCPurchasesCSVHeade
     }
 
     @Override
-    LCSCPurchasesCSVHeaders parseHeader(CSVInputContext context, String headerValue) {
-        def header = LCSCPurchasesCSVHeaders.fromString(LCSCPurchasesCSVHeaders, headerValue)
+    LCSCPurchaseCSVHeaders parseHeader(CSVInputContext context, String headerValue) {
+        def header = LCSCPurchaseCSVHeaders.fromString(LCSCPurchaseCSVHeaders, headerValue)
         header
     }
 }

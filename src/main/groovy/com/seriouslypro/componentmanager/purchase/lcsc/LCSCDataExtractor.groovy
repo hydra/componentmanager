@@ -1,4 +1,4 @@
-package com.seriouslypro.componentmanager.purchasecombiner
+package com.seriouslypro.componentmanager.purchase.lcsc
 
 import java.time.LocalDate
 import java.util.regex.Pattern

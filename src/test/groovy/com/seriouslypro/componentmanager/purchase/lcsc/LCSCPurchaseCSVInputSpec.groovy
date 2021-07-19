@@ -4,7 +4,7 @@ import com.seriouslypro.csv.CSVInput
 import com.seriouslypro.csv.CSVInputContext
 import spock.lang.Specification
 
-class LCSCPurchasesCSVInputSpec extends Specification {
+class LCSCPurchaseCSVInputSpec extends Specification {
 
     def 'parse'() {
         given:
@@ -29,7 +29,7 @@ class LCSCPurchasesCSVInputSpec extends Specification {
             ]
 
         and:
-            CSVInput csvInput = new LCSCPurchasesCSVInput(inputFileName, reader)
+            CSVInput csvInput = new LCSCPurchaseCSVInput(inputFileName, reader)
             ArrayList<LCSCPurchase> purchases = []
 
         when:

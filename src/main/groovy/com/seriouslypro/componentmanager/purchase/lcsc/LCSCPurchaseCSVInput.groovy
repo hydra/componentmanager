@@ -17,7 +17,7 @@ class LCSCPurchase {
     String currency
 }
 
-enum LCSCPurchasesCSVHeaders implements CSVColumn<LCSCPurchasesCSVHeaders> {
+enum LCSCPurchaseCSVHeaders implements CSVColumn<LCSCPurchaseCSVHeaders> {
     PART(["LCSC Part Number"]),
     MANUFACTURER_PART(["Manufacture Part Number"]),
     MANUFACTURER(["Manufacturer"]),
@@ -25,14 +25,14 @@ enum LCSCPurchasesCSVHeaders implements CSVColumn<LCSCPurchasesCSVHeaders> {
     QUANTITY(["Order Qty."]),
     PRICE(["Unit Price"])
 
-    LCSCPurchasesCSVHeaders(List<String> aliases = []) {
+    LCSCPurchaseCSVHeaders(List<String> aliases = []) {
         this.aliases = aliases
     }
 }
 
-class LCSCPurchasesCSVInput extends CSVInput<LCSCPurchase, LCSCPurchasesCSVHeaders> {
+class LCSCPurchaseCSVInput extends CSVInput<LCSCPurchase, LCSCPurchaseCSVHeaders> {
 
-    LCSCPurchasesCSVInput(String reference, Reader reader) {
+    LCSCPurchaseCSVInput(String reference, Reader reader) {
         super(reference, reader, new LCSCPurchaseHeaderParser(), new LCSCPurchaseLineParser())
     }
 }

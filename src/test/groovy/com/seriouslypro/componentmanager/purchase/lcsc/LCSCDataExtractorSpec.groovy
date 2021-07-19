@@ -1,4 +1,4 @@
-package com.seriouslypro.componentmanager.purchasecombiner
+package com.seriouslypro.componentmanager.purchase.lcsc
 
 import spock.lang.Specification
 import spock.lang.Unroll
