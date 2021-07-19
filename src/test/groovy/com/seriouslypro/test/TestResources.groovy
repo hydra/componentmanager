@@ -27,6 +27,14 @@ trait TestResources {
         inputFileName.take(inputFileName.lastIndexOf('.'))
     }
 
+    File createTemporaryFile(TemporaryFolder folder, String fileName, byte[] content) throws IOException {
+
+        File tmpFile = folder.newFile(fileName);
+        tmpFile << content
+
+        return tmpFile
+    }
+
     File createTemporaryFileFromResource(TemporaryFolder folder,
                                          String classLoaderResource) throws IOException {
         URL resource = this.getClass().getResource(classLoaderResource);
@@ -34,16 +42,13 @@ trait TestResources {
         File tmpFile = folder.newFile();
         tmpFile << new File(resource.toURI()).bytes
 
-        return tmpFile;
+        return tmpFile
     }
 
     File copyResourceToTemporaryFolder(TemporaryFolder folder, String classLoaderResource) throws IOException {
         URL resource = this.getClass().getResource(classLoaderResource);
 
         String fileName = new File(classLoaderResource).getName()
-        File tmpFile = folder.newFile(fileName);
-        tmpFile << new File(resource.toURI()).bytes
-
-        return tmpFile;
+        createTemporaryFile(folder, fileName, new File(resource.toURI()).bytes)
     }
 }

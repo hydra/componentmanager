@@ -1,0 +1,3 @@
+Date,Order Number,Supplier,Line Item,Supplier Reference,Part,Manufacturer,Description,Quantity,Unit Price,Price,Currency
+2020/5/6,20200506CEUC,LCSC,5,C301927,0402B103K500CT,Walsin Tech Corp,10nF ±10% 50V X7R 0402 Multilayer Ceramic Capacitors MLCC - SMD/SMT RoHS,10000,14.2800,0.0014,USD
+2019/6/4,20190604YOTN,LCSC,1,C8032,CL10A475KQ8NNNC,Samsung Electro-Mechanics,4.7uF ±10% 6.3V X5R 0603 Multilayer Ceramic Capacitors MLCC - SMD/SMT RoHS,4000,13.2000,0.0033,USD
