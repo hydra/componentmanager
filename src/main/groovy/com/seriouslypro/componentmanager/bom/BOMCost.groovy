@@ -13,7 +13,6 @@ class BOMCost {
         builder.b(args:1, argName: 'bom', 'BOM file/url')
         builder.pm(args:1, argName: 'partmappings', 'part mappings file/url')
         builder.ps(args:1, argName: 'partsubstitutions', 'part substitutions file/url')
-        builder.cu(args:1, argName: 'currency', 'currency')
         builder.cfg(args:1, argName: 'config', 'configuration file (in "key=value" format)')
 
         builder.c('calculate')
@@ -65,24 +64,16 @@ class BOMCost {
             partSubstitutions = options.ps
         }
 
-        String currencyCode = config.getOrDefault("currency","USD")
-        if (options.cu) {
-            currencyCode = options.cu
-        }
-
         if (options.c) {
-            boolean haveRequiredOptions = !purchases.empty && !bom.empty && !currencyCode.empty
+            boolean haveRequiredOptions = !purchases.empty && !bom.empty
 
             if (haveRequiredOptions) {
-
-                Currency currency = currencyCode as Currency
 
                 BOMCostCalculator calculator = new BOMCostCalculator(
                     bomFileName: bom,
                     purchasesFileName: purchases,
                     edaPartMappingsFileName: partMappings,
-                    edaSubstitutionsFileName: partSubstitutions,
-                    currency: currency,
+                    edaSubstitutionsFileName: partSubstitutions
                 )
                 BOMCostResult result = calculator.calculate()
                 dumpBOMCostResult(result)
@@ -98,7 +89,7 @@ class BOMCost {
     }
 
     static void dumpBOMCostResult(BOMCostResult bomCostResult) {
-        System.out.println("Cost: ${bomCostResult.cost} ${bomCostResult.currency}")
+        System.out.println("Cost: ${bomCostResult.cost}")
     }
 
     public static void main(String [] args) {

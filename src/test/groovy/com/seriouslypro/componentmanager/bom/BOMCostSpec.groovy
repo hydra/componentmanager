@@ -29,7 +29,6 @@ class BOMCostSpec extends Specification implements TestResources {
             String[] args = [
                 "-c",
                 "-cfg", configFileName,
-                "-cu", "USD",
                 "-p", purchasesFile.absolutePath,
                 "-b", bomFile.absolutePath,
                 "-pm", partMappingsFile.absolutePath,
@@ -39,7 +38,8 @@ class BOMCostSpec extends Specification implements TestResources {
         and:
             String[] expectedLines = [
                 "CAP_0402, 100nF 6.3V 0402 -> CAP_0402, 100nF 50V 0402 -> Manufacturer: Walsin Tech Corp, Part Code: 0402B104K500CT, Order reference: WM210706790W, Unit price: 0.0024 USD",
-                "CAP_0603, 4.7uF 6.3V 0603 10% -> Manufacturer: Samsung Electro-Mechanics, Part Code: CL10A475KQ8NNNC, Order reference: 20190604YOTN, Unit price: 0.0033 USD"
+                "CAP_0603, 4.7uF 6.3V 0603 10% -> Manufacturer: Samsung Electro-Mechanics, Part Code: CL10A475KQ8NNNC, Order reference: 20190604YOTN, Unit price: 0.0033 USD",
+                "LED_0603, GREEN -> Manufacturer: BrightLed, Part Code: BL-0603-GREEN-A34, Order reference: 506908342095201, Unit price: 0.0043 GBP"
             ]
 
         when:
@@ -58,7 +58,7 @@ class BOMCostSpec extends Specification implements TestResources {
             }
 
         and:
-            capturedOutput.contains("Cost: 0.0387 USD")
+            capturedOutput.contains("Cost: [USD:0.0387, GBP:0.0086]")
 
         and:
             returnCode == 0

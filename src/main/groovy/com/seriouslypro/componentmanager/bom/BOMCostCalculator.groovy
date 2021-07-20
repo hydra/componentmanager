@@ -47,8 +47,6 @@ class BOMCostCalculator {
     String edaPartMappingsFileName
     String edaSubstitutionsFileName
 
-    Currency currency
-
     PartMapper partMapper = new PartMapper()
     PartSubstitutor partSubstitutor = new PartSubstitutor()
 
@@ -95,7 +93,6 @@ class BOMCostCalculator {
 
 
         BOMCostResult result = new BOMCostResult()
-        result.currency = currency
 
         List<BOMItemOption> unmatchedBomItemOptions = []
 
@@ -112,8 +109,11 @@ class BOMCostCalculator {
 
                 System.out.println(message)
 
-                BigDecimal totalCost = purchase.unitPrice * bomItemOption.item.quantity
-                result.cost += totalCost
+                BigDecimal bomItemCost = purchase.unitPrice * bomItemOption.item.quantity
+                if (!result.cost.containsKey(purchase.currency)) {
+                    result.cost[purchase.currency] = 0.0
+                }
+                result.cost[purchase.currency] += bomItemCost
             } else {
                 unmatchedBomItemOptions << bomItemOption
             }
