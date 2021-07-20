@@ -23,6 +23,7 @@ class BOMCostSpec extends Specification implements TestResources {
             File purchasesFile = copyResourceToTemporaryFolder(temporaryFolder,testResource('/test-purchases.csv'))
             File bomFile = copyResourceToTemporaryFolder(temporaryFolder,testResource('/test-bom.csv'))
             File partMappingsFile = copyResourceToTemporaryFolder(temporaryFolder,testResource('/test-partmappings.csv'))
+            File partSubstitutionsFile = copyResourceToTemporaryFolder(temporaryFolder,testResource('/test-partsubstitutions.csv'))
 
         and:
             String[] args = [
@@ -31,7 +32,8 @@ class BOMCostSpec extends Specification implements TestResources {
                 "-cu", "USD",
                 "-p", purchasesFile.absolutePath,
                 "-b", bomFile.absolutePath,
-                "-pm", partMappingsFile.absolutePath
+                "-pm", partMappingsFile.absolutePath,
+                "-ps", partSubstitutionsFile.absolutePath
             ]
 
         when:

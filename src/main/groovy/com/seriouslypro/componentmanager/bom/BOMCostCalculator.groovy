@@ -10,6 +10,8 @@ import com.seriouslypro.eda.BOMItemOption
 import com.seriouslypro.eda.diptrace.bom.DipTraceBOMCSVInput
 import com.seriouslypro.eda.part.PartMapper
 import com.seriouslypro.eda.part.PartMapping
+import com.seriouslypro.eda.part.PartSubstitution
+import com.seriouslypro.eda.part.PartSubstitutor
 import com.seriouslypro.pnpconvert.FileTools
 import groovy.transform.ToString
 
@@ -39,12 +41,16 @@ class ExactOptionMatchingStrategy implements BOMOptionMatchingStrategy {
 }
 
 class BOMCostCalculator {
+
     String bomFileName
     String purchasesFileName
-    Currency currency
     String edaPartMappingsFileName
+    String edaSubstitutionsFileName
+
+    Currency currency
 
     PartMapper partMapper = new PartMapper()
+    PartSubstitutor partSubstitutor = new PartSubstitutor()
 
     List<BOMItemMatchingStrategy> itemMatchingStrategies = [
         new NameOnlyItemMatchingStrategy()
@@ -60,6 +66,10 @@ class BOMCostCalculator {
             partMapper.loadFromCSV(edaPartMappingsFileName)
         }
 
+        if (edaSubstitutionsFileName) {
+            partSubstitutor.loadFromCSV(edaSubstitutionsFileName)
+        }
+
         Reader bomReader = FileTools.openFileOrUrl(bomFileName)
 
         CSVInput bomCSVInput = new DipTraceBOMCSVInput(bomFileName, bomReader)
@@ -67,8 +77,12 @@ class BOMCostCalculator {
 
         bomCSVInput.parseHeader()
         bomCSVInput.parseLines { CSVInputContext context, BOMItem bomItem, String[] line ->
-            List<PartMapping> options = partMapper.buildOptions(bomItem)
-            bomItemOptions << new BOMItemOption(item: bomItem, options: options)
+
+            List<PartSubstitution> partSubstitutions = partSubstitutor.findSubstitutions(bomItem)
+            BOMItem substitute = chooseAndBuildSubstitute(bomItem, partSubstitutions)
+
+            List<PartMapping> options = partMapper.buildOptions(substitute)
+            bomItemOptions << new BOMItemOption(originalItem: bomItem, item: substitute, options: options)
         }
 
         Reader purchasesReader = FileTools.openFileOrUrl(purchasesFileName)
@@ -94,6 +108,18 @@ class BOMCostCalculator {
         }
 
         return result
+    }
+
+    BOMItem chooseAndBuildSubstitute(BOMItem bomItem, List<PartSubstitution> partSubstitutions) {
+        if (partSubstitutions.empty) {
+            return bomItem
+        }
+
+        PartSubstitution selectedSubstitution = partSubstitutions.first()
+
+        BOMItem substitute = partSubstitutor.buildSubstitute(bomItem, selectedSubstitution)
+
+        return substitute
     }
 
     Optional<Purchase> findPurchase(List<Purchase> purchases, BOMItemOption bomItemOption) {

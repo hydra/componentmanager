@@ -54,9 +54,10 @@ The workflow is currently:
 Then:
 
 1) Export BOM from EDA tool (DipTrace)
-2) create Name + Value to Order-code & Manufacturer file for each component to be used.
-3) run BOMCost to calculate the cost for the BOM.
-4) repeat as required.
+2) create Name + Value to Name + Value part substitutions file for the project (design specific substitutions)
+3) create Name + Value to Order-code & Manufacturer file for each component to be used. (an EDA to order-code mapping)
+4) run BOMCost to calculate the cost for the BOM.
+5) repeat as required.
 
 Limitations
 ===========

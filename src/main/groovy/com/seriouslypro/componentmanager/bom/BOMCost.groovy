@@ -12,6 +12,7 @@ class BOMCost {
         builder.p(args:1, argName: 'purchases', 'purchases file/url')
         builder.b(args:1, argName: 'bom', 'BOM file/url')
         builder.pm(args:1, argName: 'partmappings', 'part mappings file/url')
+        builder.ps(args:1, argName: 'partsubstitutions', 'part substitutions file/url')
         builder.cu(args:1, argName: 'currency', 'currency')
         builder.cfg(args:1, argName: 'config', 'configuration file (in "key=value" format)')
 
@@ -58,6 +59,12 @@ class BOMCost {
         if (options.pm) {
             partMappings = options.pm
         }
+
+        String partSubstitutions = config.getOrDefault("partsubstitutions","partsubstitutions.csv")
+        if (options.ps) {
+            partSubstitutions = options.ps
+        }
+
         String currencyCode = config.getOrDefault("currency","USD")
         if (options.cu) {
             currencyCode = options.cu
@@ -74,6 +81,7 @@ class BOMCost {
                     bomFileName: bom,
                     purchasesFileName: purchases,
                     edaPartMappingsFileName: partMappings,
+                    edaSubstitutionsFileName: partSubstitutions,
                     currency: currency,
                 )
                 BOMCostResult result = calculator.calculate()

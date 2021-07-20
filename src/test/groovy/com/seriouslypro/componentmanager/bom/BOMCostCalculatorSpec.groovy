@@ -22,17 +22,23 @@ class BOMCostCalculatorSpec extends Specification implements TestResources {
 
             String edaPartMappings = 'Name Pattern,Value Pattern,Code,Manufacturer\n' +
                 'CAP_0402,10nF 6.3V 0402,MC0402X103K6R3CT,Multicomp\n' +
-                'CAP_0402,10nF 6.3V 0402,0402B103K500CT,Walsin Tech Corp\n' +
+                'CAP_0402,10nF 50V 0402,0402B103K500CT,Walsin Tech Corp\n' +
                 'CAP_0402,100nF 6.3V 0402,MC0402X104K6R3CT,Multicomp\n' +
-                'CAP_0402,100nF 6.3V 0402,0402B104K500CT,Walsin Tech Corp\n' +
+                'CAP_0402,100nF 50V 0402,0402B104K500CT,Walsin Tech Corp\n' +
                 'CAP_0603,4.7uF 6.3V 0603 10%,CL10A475KQ8NNNC,Samsung Electro-Mechanics\n'
             File edaPartMappingsFile = createTemporaryFile(temporaryFolder, "edapartmappings.csv", edaPartMappings.getBytes("UTF-8"))
+
+            String edaSubstitutions = 'Name Pattern,Value Pattern,Name,Value\n' +
+                'CAP_0402,10nF 6.3V 0402,CAP_0402,10nF 50V 0402\n' +
+                'CAP_0402,100nF 6.3V 0402,CAP_0402,100nF 50V 0402'
+            File edaSubstitutionsFile = createTemporaryFile(temporaryFolder, "edasubstitutions.csv", edaSubstitutions.getBytes("UTF-8"))
 
         and:
             BOMCostCalculator calculator = new BOMCostCalculator(
                 purchasesFileName: purchasesFile.absolutePath,
                 bomFileName: bomFile.absolutePath,
                 edaPartMappingsFileName: edaPartMappingsFile.absolutePath,
+                edaSubstitutionsFileName: edaSubstitutionsFile.absolutePath,
                 currency: USD
             )
 
