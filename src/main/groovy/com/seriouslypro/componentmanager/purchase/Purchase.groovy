@@ -12,7 +12,7 @@ class Purchase {
     String supplier
     int lineItem // 1-based
     String supplierReference
-    String part
+    String partCode
     String manufacturer
     String description
     int Quantity

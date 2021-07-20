@@ -24,7 +24,7 @@ class NameOnlyItemMatchingStrategy implements BOMItemMatchingStrategy {
 
     @Override
     boolean matches(Purchase candidate, BOMItem bomItem) {
-        bomItem.name && bomItem.name == candidate.part
+        bomItem.name && bomItem.name == candidate.partCode
     }
 }
 
@@ -36,7 +36,7 @@ interface BOMOptionMatchingStrategy {
 class ExactOptionMatchingStrategy implements BOMOptionMatchingStrategy {
 
     boolean matches(Purchase candidate, PartMapping partMapping) {
-        candidate.part == partMapping.code && candidate.manufacturer == partMapping.manufacturer
+        candidate.partCode == partMapping.partCode && candidate.manufacturer == partMapping.manufacturer
     }
 }
 
@@ -97,15 +97,42 @@ class BOMCostCalculator {
         BOMCostResult result = new BOMCostResult()
         result.currency = currency
 
+        List<BOMItemOption> unmatchedBomItemOptions = []
+
         bomItemOptions.eachWithIndex { BOMItemOption bomItemOption, int i ->
             Optional<Purchase> optionalPurchase = findPurchase(purchases, bomItemOption)
             if (optionalPurchase.present) {
                 Purchase purchase = optionalPurchase.get()
 
+                String message = "${bomItemOption.originalItem.name}, ${bomItemOption.originalItem.value}"
+                if (bomItemOption.originalItem != bomItemOption.item) {
+                    message += " -> ${bomItemOption.item.name}, ${bomItemOption.item.value}"
+                }
+                message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Order reference: ${purchase.orderReference}, Unit price: ${purchase.unitPrice} Unit price: ${purchase.currency}"
+
+                System.out.println(message)
+
                 BigDecimal totalCost = purchase.unitPrice * bomItemOption.item.quantity
                 result.cost += totalCost
+            } else {
+                unmatchedBomItemOptions << bomItemOption
             }
         }
+
+        if (unmatchedBomItemOptions) {
+            System.out.println("Unmatched BOM items")
+            unmatchedBomItemOptions.each { bomItemOption ->
+                System.out.println("${bomItemOption.item.name}, ${bomItemOption.item.value}, ${bomItemOption.item.refdesList}")
+                String indentation = "\t"
+                if (bomItemOption.originalItem != bomItemOption.item) {
+                    System.out.println("${indentation}Substituted from ${bomItemOption.originalItem.name}, ${bomItemOption.originalItem.value}")
+                }
+                bomItemOption.options.eachWithIndex { PartMapping partMapping, int index ->
+                    System.out.println("${indentation}${index} -> Manufacturer: ${partMapping.manufacturer}, Part Code: ${partMapping.partCode}")
+                }
+            }
+        }
+
 
         return result
     }
@@ -123,9 +150,9 @@ class BOMCostCalculator {
     }
 
     Optional<Purchase> findPurchase(List<Purchase> purchases, BOMItemOption bomItemOption) {
-        System.out.println("Finding purchase for bomItemOption: $bomItemOption")
+        Debug.trace("Finding purchase for bomItemOption: $bomItemOption")
         Purchase matched = purchases.findResult { purchase ->
-            System.out.println("Order Reference: ${purchase.orderReference}, Part: ${purchase.part}, Manufacturer: ${purchase.manufacturer}")
+            Debug.trace("Order Reference: ${purchase.orderReference}, Part: ${purchase.partCode}, Manufacturer: ${purchase.manufacturer}")
             itemMatches(purchase, bomItemOption)
         }
         Optional.ofNullable(matched)
@@ -149,7 +176,7 @@ class BOMCostCalculator {
             }
         }
 
-        System.out.println(results)
+        Debug.trace(results.toString())
         if (results.empty) {
             return null
         }

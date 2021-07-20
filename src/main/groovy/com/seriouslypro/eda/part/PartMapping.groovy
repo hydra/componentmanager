@@ -9,6 +9,6 @@ class PartMapping {
     String valuePattern
 
     // Ordering information
-    String code
+    String partCode
     String manufacturer
 }

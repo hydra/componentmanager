@@ -23,7 +23,7 @@ class PartMapper {
     static enum EDAPartMappingCSVColumn implements CSVColumn<EDAPartMappingCSVColumn> {
         NAME_PATTERN,
         VALUE_PATTERN,
-        CODE,
+        PART_CODE,
         MANUFACTURER
 
         EDAPartMappingCSVColumn(List<String> aliases = []) {
@@ -46,7 +46,7 @@ class PartMapper {
                 return new PartMapping(
                     namePattern: rowValues[columnIndex(context, EDAPartMappingCSVColumn.NAME_PATTERN)].trim(),
                     valuePattern: rowValues[columnIndex(context, EDAPartMappingCSVColumn.VALUE_PATTERN)].trim(),
-                    code: rowValues[columnIndex(context, EDAPartMappingCSVColumn.CODE)].trim(),
+                    partCode: rowValues[columnIndex(context, EDAPartMappingCSVColumn.PART_CODE)].trim(),
                     manufacturer: rowValues[columnIndex(context, EDAPartMappingCSVColumn.MANUFACTURER)].trim(),
                 )
             }

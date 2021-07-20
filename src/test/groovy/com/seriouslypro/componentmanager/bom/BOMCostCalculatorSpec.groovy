@@ -20,7 +20,7 @@ class BOMCostCalculatorSpec extends Specification implements TestResources {
                 '"C3, C8, C23";"4.7uF 6.3V 0603 10%";"CAP_0603";"3";"TDK";"http://www.farnell.com/datasheets/2291921.pdf";"2";"CAP_0603"'
             File bomFile = createTemporaryFile(temporaryFolder, "bom.csv", bom.getBytes("UTF-8"))
 
-            String edaPartMappings = 'Name Pattern,Value Pattern,Code,Manufacturer\n' +
+            String edaPartMappings = 'Name Pattern,Value Pattern,Part Code,Manufacturer\n' +
                 'CAP_0402,10nF 6.3V 0402,MC0402X103K6R3CT,Multicomp\n' +
                 'CAP_0402,10nF 50V 0402,0402B103K500CT,Walsin Tech Corp\n' +
                 'CAP_0402,100nF 6.3V 0402,MC0402X104K6R3CT,Multicomp\n' +

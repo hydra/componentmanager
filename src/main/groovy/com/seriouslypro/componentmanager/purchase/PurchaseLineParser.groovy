@@ -17,7 +17,7 @@ class PurchaseLineParser extends CSVLineParserBase<Purchase, PurchaseCSVHeaders>
             supplier: rowValues[columnIndex(context, PurchaseCSVHeaders.SUPPLIER)] as String,
             lineItem: rowValues[columnIndex(context, PurchaseCSVHeaders.LINE_ITEM)] as Integer,
             supplierReference: rowValues[columnIndex(context, PurchaseCSVHeaders.SUPPLIER_REFERENCE)] as String,
-            part: rowValues[columnIndex(context, PurchaseCSVHeaders.PART)] as String,
+            partCode: rowValues[columnIndex(context, PurchaseCSVHeaders.PART)] as String,
             manufacturer: rowValues[columnIndex(context, PurchaseCSVHeaders.MANUFACTURER)] as String,
             description: rowValues[columnIndex(context, PurchaseCSVHeaders.DESCRIPTION)] as String,
             quantity: rowValues[columnIndex(context, PurchaseCSVHeaders.QUANTITY)] as Integer,

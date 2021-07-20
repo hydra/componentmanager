@@ -36,6 +36,12 @@ class BOMCostSpec extends Specification implements TestResources {
                 "-ps", partSubstitutionsFile.absolutePath
             ]
 
+        and:
+            String[] expectedLines = [
+                "CAP_0402, 100nF 6.3V 0402 -> CAP_0402, 100nF 50V 0402 -> Manufacturer: Walsin Tech Corp, Part Code: 0402B104K500CT, Order reference: WM210706790W, Unit price: 0.0024 Unit price: USD",
+                "CAP_0603, 4.7uF 6.3V 0603 10% -> Manufacturer: Samsung Electro-Mechanics, Part Code: CL10A475KQ8NNNC, Order reference: 20190604YOTN, Unit price: 0.0033 Unit price: USD"
+            ]
+
         when:
             Integer returnCode = BOMCost.processArgs(args)
 
@@ -45,6 +51,11 @@ class BOMCostSpec extends Specification implements TestResources {
         and:
             String capturedOutput = capture.toString()
             !capturedOutput.empty
+
+        and:
+            expectedLines.each { expectedLine ->
+                assert capturedOutput.contains(expectedLine)
+            }
 
         and:
             capturedOutput.contains("Cost: 0.0387 USD")
