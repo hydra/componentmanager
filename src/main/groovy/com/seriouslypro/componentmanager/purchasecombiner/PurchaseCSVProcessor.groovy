@@ -149,7 +149,7 @@ class PurchaseCSVProcessor {
                     csvInput = new LCSCPurchaseCSVInput(sourceFile.name, reader)
                     break;
                 case Supplier.MOUSER:
-                    Reader reader = new FileReader(sourceFile)
+                    Reader reader =  new InputStreamReader(new FileInputStream(sourceFile), "UTF-8")
                     csvInput = new MouserPurchaseCSVInput(sourceFile.name, reader)
                     break
             }
