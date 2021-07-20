@@ -1,8 +1,9 @@
-configs
-credentials
-tokens
-out
-build
-
 .gradle
+/build/
+/out/
+
+/configs/
+/credentials/
+/tokens/
+
 
