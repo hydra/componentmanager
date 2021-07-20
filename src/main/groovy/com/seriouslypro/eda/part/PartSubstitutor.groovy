@@ -4,8 +4,6 @@ import com.seriouslypro.csv.*
 import com.seriouslypro.eda.BOMItem
 import com.seriouslypro.pnpconvert.FileTools
 
-import javax.servlet.http.Part
-
 class PartSubstitutor {
 
     List<PartSubstitution> partSubstitutions = []
@@ -54,11 +52,20 @@ class PartSubstitutor {
             @Override
             PartSubstitution parse(CSVInputContext context, String[] rowValues) {
 
+                def namePattern = rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.NAME_PATTERN)].trim()
+                def valuePattern = rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.VALUE_PATTERN)].trim()
+                def name = rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.NAME)].trim()
+                def value = rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.VALUE)].trim()
+
+                if (!(namePattern && valuePattern && name && value)) {
+                    throw new CSVInput.CSVParseException("one or more missing values")
+                }
+
                 return new PartSubstitution(
-                    namePattern: rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.NAME_PATTERN)].trim(),
-                    valuePattern: rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.VALUE_PATTERN)].trim(),
-                    name: rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.NAME)].trim(),
-                    value: rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.VALUE)].trim(),
+                    namePattern: namePattern,
+                    valuePattern: valuePattern,
+                    name: name,
+                    value: value,
                 )
             }
         }
