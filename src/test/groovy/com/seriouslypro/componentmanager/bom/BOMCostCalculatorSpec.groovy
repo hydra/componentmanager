@@ -15,9 +15,9 @@ class BOMCostCalculatorSpec extends Specification implements TestResources {
                 '2019/12/14,20190604YOTN,LCSC,1,C8032,CL10A475KQ8NNNC,Samsung Electro-Mechanics,"4.7uF ±10% 6.3V X5R 0603 Multilayer Ceramic Capacitors MLCC,SMD/SMT RoHS",4000,0.0033,13.2000,USD'
             File purchasesFile = createTemporaryFile(temporaryFolder, "purchases.csv", purchases.getBytes("UTF-8"))
 
-            String bom = '"RefDes";"Value";"Name";"Part";"Quantity";"Manufacturer";"Datasheet";"Number of Pins";"Pattern"\n' +
-                '"C1, C2, C5, C7, C9, C11, C12, C21, C22, C26, C29, C35";"100nF 6.3V 0402";"CAP_0402";"MC0402X104K6R3CT";"12";"";"";"2";"CAP_0402_201906"\n' +
-                '"C3, C8, C23";"4.7uF 6.3V 0603 10%";"CAP_0603";"C1608X7S0J475K080AC ";"3";"TDK";"http://www.farnell.com/datasheets/2291921.pdf";"2";"CAP_0603"'
+            String bom = '"RefDes";"Value";"Name";"Quantity";"Manufacturer";"Datasheet";"Number of Pins";"Pattern"\n' +
+                '"C1, C2, C5, C7, C9, C11, C12, C21, C22, C26, C29, C35";"100nF 6.3V 0402";"CAP_0402";"12";"";"";"2";"CAP_0402_201906"\n' +
+                '"C3, C8, C23";"4.7uF 6.3V 0603 10%";"CAP_0603";"3";"TDK";"http://www.farnell.com/datasheets/2291921.pdf";"2";"CAP_0603"'
             File bomFile = createTemporaryFile(temporaryFolder, "bom.csv", bom.getBytes("UTF-8"))
 
             String edaPartMappings = 'Name Pattern,Value Pattern,Code,Manufacturer\n' +
