@@ -108,7 +108,7 @@ class BOMCostCalculator {
                 if (bomItemOption.originalItem != bomItemOption.item) {
                     message += " -> ${bomItemOption.item.name}, ${bomItemOption.item.value}"
                 }
-                message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Order reference: ${purchase.orderReference}, Unit price: ${purchase.unitPrice} Unit price: ${purchase.currency}"
+                message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Order reference: ${purchase.orderReference}, Unit price: ${purchase.unitPrice} ${purchase.currency}"
 
                 System.out.println(message)
 
