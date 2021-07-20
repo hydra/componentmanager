@@ -13,7 +13,7 @@ class LCSCPurchaseLineParser  extends CSVLineParserBase<LCSCPurchase, LCSCPurcha
         BigDecimal price = priceWithCurrencySymbol.substring(1) as BigDecimal
 
         LCSCPurchase lcscPurchase = new LCSCPurchase(
-            lcscPart: rowValues[columnIndex(context, LCSCPurchaseCSVHeaders.PART)],
+            supplierPart: rowValues[columnIndex(context, LCSCPurchaseCSVHeaders.PART)],
             manufacturerPart: rowValues[columnIndex(context, LCSCPurchaseCSVHeaders.MANUFACTURER_PART)],
             manufacturer: rowValues[columnIndex(context, LCSCPurchaseCSVHeaders.MANUFACTURER)],
             description: rowValues[columnIndex(context, LCSCPurchaseCSVHeaders.DESCRIPTION)],

@@ -2,22 +2,7 @@ package com.seriouslypro.componentmanager.purchase.lcsc
 
 import com.seriouslypro.csv.*
 
-class LCSCPurchaseHeaderParser  implements CSVHeaderParser<LCSCPurchaseCSVHeaders> {
-
-    private Map<LCSCPurchaseCSVHeaders, CSVHeader> createHeaderMappings(CSVInputContext context, String[] headerValues) {
-        Map<LCSCPurchaseCSVHeaders, CSVHeader> headerMappings = [:]
-        headerValues.eachWithIndex { String headerValue, Integer index ->
-            try {
-                LCSCPurchaseCSVHeaders LCSCPurchasesCSVHeader = parseHeader(context, headerValue)
-                CSVHeader csvHeader = new CSVHeader()
-                csvHeader.index = index
-                headerMappings[LCSCPurchasesCSVHeader] = csvHeader
-            } catch (IllegalArgumentException ignored) {
-                // ignore unknown header
-            }
-        }
-        headerMappings
-    }
+class LCSCPurchaseHeaderParser extends CSVHeaderParserBase<LCSCPurchaseCSVHeaders> {
 
     @Override
     Map<LCSCPurchaseCSVHeaders, CSVHeader> parseHeaders(CSVInputContext context, String[] headerValues) {

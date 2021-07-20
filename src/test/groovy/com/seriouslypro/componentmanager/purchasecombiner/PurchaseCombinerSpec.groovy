@@ -1,6 +1,7 @@
 package com.seriouslypro.componentmanager.purchasecombiner
 
 import com.seriouslypro.test.TestResources
+import org.junit.rules.TemporaryFolder
 import org.springframework.boot.test.OutputCapture
 import spock.lang.Specification
 
@@ -28,15 +29,24 @@ class PurchaseCombinerSpec extends Specification implements TestResources {
             String sheetId = "1ercprkhq2sgZA0bfLPEqt_no3pZPJE9bxUEwaIFa3bo"
 
         and:
-            String sourceDirectory = temporaryFolder.getRoot()
+            File sourceDirectoryLCSC = temporaryFolder.newFolder('LCSC')
+            File sourceDirectoryMouser = temporaryFolder.newFolder('Mouser')
 
         and:
-            copyResourceToTemporaryFolder(temporaryFolder,testResource('/20210128VAXS.csv'))
-            copyResourceToTemporaryFolder(temporaryFolder,testResource('/WM210614632W.csv'))
-
+            copyResource(sourceDirectoryLCSC, testResource('/LCSC/20210128VAXS.csv'))
+            copyResource(sourceDirectoryLCSC, testResource('/LCSC/WM210614632W.csv'))
 
         and:
-            String[] args = ["-u", "-cfg", configFileName, "-sd", sourceDirectory, "-s", sheetId]
+            copyResource(sourceDirectoryMouser, testResource('/Mouser/MouserSearch1216PM.csv'))
+
+        and:
+            String[] args = [
+                "-u",
+                "-cfg", configFileName,
+                "-sd", sourceDirectoryLCSC,
+                "-sd", sourceDirectoryMouser,
+                "-s", sheetId
+            ]
 
         when:
             Integer returnCode = PurchaseCombiner.processArgs(args)

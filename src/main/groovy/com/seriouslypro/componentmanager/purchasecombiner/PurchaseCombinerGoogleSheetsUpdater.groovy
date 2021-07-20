@@ -19,7 +19,7 @@ class PurchaseCombinerGoogleSheetsUpdater {
 
     String sheetId
     String credentialsFileName
-    String sourceDirectory
+    List<String> sourceDirectories
 
     CredentialFactory credentialFactory = new CredentialFactory()
     TransportFactory transportFactory = new GoogleSheetsTransportFactory()
@@ -46,13 +46,15 @@ class PurchaseCombinerGoogleSheetsUpdater {
             throw new SheetNotFoundException(SHEET_TITLE_PURCHASE_HISTORY)
         }
 
-        new File(sourceDirectory).eachFileMatch(FileType.FILES, ~/.*\.csv/) { sourceFile ->
-            PurchaseCSVProcessor purchaseCSVProcessor = new PurchaseCSVProcessor(
-                service: service,
-                spreadsheet: spreadsheet,
-                sheet: purchaseHistorySheet
-            )
-            purchaseCSVProcessor.process(sourceFile)
+        sourceDirectories.each { sourceDirectory ->
+            new File(sourceDirectory).eachFileMatch(FileType.FILES, ~/.*\.csv/) { sourceFile ->
+                PurchaseCSVProcessor purchaseCSVProcessor = new PurchaseCSVProcessor(
+                    service: service,
+                    spreadsheet: spreadsheet,
+                    sheet: purchaseHistorySheet
+                )
+                purchaseCSVProcessor.process(sourceFile)
+            }
         }
     }
 }

@@ -1,23 +1,16 @@
 package com.seriouslypro.componentmanager.purchasecombiner
 
 import com.google.api.services.sheets.v4.Sheets
-import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest
-import com.google.api.services.sheets.v4.model.DimensionRange
-import com.google.api.services.sheets.v4.model.GridRange
-import com.google.api.services.sheets.v4.model.InsertDimensionRequest
-import com.google.api.services.sheets.v4.model.Request
-import com.google.api.services.sheets.v4.model.Sheet
-import com.google.api.services.sheets.v4.model.Spreadsheet
-import com.google.api.services.sheets.v4.model.UpdateValuesResponse
-import com.google.api.services.sheets.v4.model.ValueRange
+import com.google.api.services.sheets.v4.model.*
+import com.seriouslypro.componentmanager.bom.Debug
 import com.seriouslypro.componentmanager.purchase.lcsc.LCSCDataExtractor
-import com.seriouslypro.componentmanager.purchase.lcsc.LCSCPurchase
 import com.seriouslypro.componentmanager.purchase.lcsc.LCSCPurchaseCSVInput
+import com.seriouslypro.componentmanager.purchase.lcsc.SupplierPurchase
+import com.seriouslypro.componentmanager.purchase.mouser.MouserPurchaseCSVInput
 import com.seriouslypro.csv.CSVInput
+import com.seriouslypro.csv.CSVInput.CSVParseException
 import com.seriouslypro.csv.CSVInputContext
 import com.seriouslypro.googlesheets.GridRangeConverter
-
-import java.time.LocalDate
 
 class PurchaseCSVProcessor {
     Sheets service
@@ -29,21 +22,17 @@ class PurchaseCSVProcessor {
     private static final int HEADER_ROW_COUNT = 1
 
     void process(File sourceFile) {
-        ArrayList<LCSCPurchase> purchases = readPurchases(sourceFile)
+        ArrayList<SupplierPurchase> purchases = readPurchases(sourceFile)
         System.out.println(purchases)
 
         if (purchases.empty) {
             return
         }
 
-        LCSCDataExtractor lcscDataExtractor = new LCSCDataExtractor(fileName: sourceFile.name)
-        LocalDate orderDate = lcscDataExtractor.getOrderDate()
-        String orderNumber = lcscDataExtractor.getOrderNumber()
-
-        updateSheet(orderDate, orderNumber, purchases)
+        updateSheet(purchases)
     }
 
-    void updateSheet(LocalDate orderDate, String orderNumber, ArrayList<LCSCPurchase> lcscPurchases) {
+    void updateSheet( ArrayList<SupplierPurchase> purchases) {
 
         String spreadsheetId = spreadsheet.getSpreadsheetId()
         String sheetTitle = sheet.getProperties().getTitle()
@@ -68,25 +57,25 @@ class PurchaseCSVProcessor {
         List<List<Object>> headersValues = headersValuesRangeResponse.getValues()
         dumpRows(headersValues)
 
-        insertRows(spreadsheetId, HEADER_ROW_COUNT, lcscPurchases.size())
-        updateRows(spreadsheetId, sheetTitle, HEADER_ROW_COUNT, columnCount, orderDate, orderNumber, lcscPurchases)
+        insertRows(spreadsheetId, HEADER_ROW_COUNT, purchases.size())
+        updateRows(spreadsheetId, sheetTitle, HEADER_ROW_COUNT, columnCount, purchases)
     }
 
-    void updateRows(String spreadsheetId, String sheetTitle, Integer start, Integer columnCount, LocalDate orderDate, String orderNumber, ArrayList<LCSCPurchase> purchases) {
+    void updateRows(String spreadsheetId, String sheetTitle, Integer start, Integer columnCount, List<SupplierPurchase> purchases) {
 
         ValueRange valueRange = new ValueRange()
         List<List<Object>> rows = []
 
 
-        purchases.eachWithIndex { LCSCPurchase purchase, int i ->
+        purchases.eachWithIndex { SupplierPurchase purchase, int i ->
             List<Object> row = [null] * columnCount
 
             // TODO use a header to column index mapping, fixed index for now.
-            row[0] = orderDate.format("yyyy/MM/dd")
-            row[1] = orderNumber
-            row[2] = "LCSC"
+            row[0] = purchase.orderDate.format("yyyy/MM/dd")
+            row[1] = purchase.orderNumber
+            row[2] = purchase.supplier
             row[3] = indexToLineItem(i)
-            row[4] = purchase.lcscPart
+            row[4] = purchase.supplierPart
             row[5] = purchase.manufacturerPart
             row[6] = purchase.manufacturer
             row[7] = purchase.description
@@ -139,23 +128,65 @@ class PurchaseCSVProcessor {
 
     static void dumpRows(List<List<Object>> rowsValues) {
         rowsValues.each { rowValues ->
-            println(rowValues)
+            Debug.trace(rowValues as String)
         }
     }
 
-    private ArrayList<LCSCPurchase> readPurchases(File sourceFile) {
-        Reader reader = makeLCSCFileReader(sourceFile)
+    enum Supplier {
+        LCSC,
+        MOUSER
+    }
 
-        CSVInput csvInput = new LCSCPurchaseCSVInput(sourceFile.name, reader)
+    private ArrayList<SupplierPurchase> readPurchases(File sourceFile) {
 
-        csvInput.parseHeader()
+        List<Exception> exceptions = []
+        CSVInput csvInput
 
-        ArrayList<LCSCPurchase> purchases = []
-        csvInput.parseLines { CSVInputContext context, LCSCPurchase purchase, String[] line ->
+        Supplier supplier = Supplier.find { supplier ->
+            switch (supplier) {
+                case Supplier.LCSC:
+                    Reader reader = makeLCSCFileReader(sourceFile)
+                    csvInput = new LCSCPurchaseCSVInput(sourceFile.name, reader)
+                    break;
+                case Supplier.MOUSER:
+                    Reader reader = new FileReader(sourceFile)
+                    csvInput = new MouserPurchaseCSVInput(sourceFile.name, reader)
+                    break
+            }
+
+            try {
+                csvInput.parseHeader()
+            } catch (CSVParseException parseException) {
+                exceptions << parseException
+                return false
+            }
+
+            return true
+        }
+
+        if (!supplier) {
+            throw new RuntimeException("No parsers were able to parse the file '$sourceFile', exceptions: '$exceptions'")
+        }
+
+
+        ArrayList<SupplierPurchase> purchases = []
+        csvInput.parseLines { CSVInputContext context, SupplierPurchase purchase, String[] line ->
+
+            switch(supplier) {
+                case Supplier.LCSC:
+                    // For now, we repeat this for every purchase, a later refactoring should seek to remove both the switch statements in this method.
+                    LCSCDataExtractor lcscDataExtractor = new LCSCDataExtractor(fileName: sourceFile.name)
+
+                    purchase.orderDate = lcscDataExtractor.getOrderDate()
+                    purchase.orderNumber = lcscDataExtractor.getOrderNumber()
+                    break;
+            }
+
             purchases << purchase
         }
 
         csvInput.close()
+
 
         purchases
     }

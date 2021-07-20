@@ -1,20 +1,32 @@
 package com.seriouslypro.componentmanager.purchase.lcsc
 
+
 import com.seriouslypro.csv.CSVColumn
 import com.seriouslypro.csv.CSVInput
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
-@ToString(includeNames = true, includePackage = false)
+import java.time.LocalDate
+
+@ToString(includeNames = true, includePackage = false, includeSuperProperties = true)
 @EqualsAndHashCode
-class LCSCPurchase {
-    String lcscPart
+class LCSCPurchase extends SupplierPurchase {
+    String supplier = 'LCSC'
+}
+
+@ToString(includeNames = true, includePackage = false)
+abstract class SupplierPurchase {
+    String supplierPart
     String manufacturerPart
     String manufacturer
     String description
     Integer quantity
     BigDecimal price
     String currency
+    LocalDate orderDate
+    String orderNumber
+
+    abstract String getSupplier()
 }
 
 enum LCSCPurchaseCSVHeaders implements CSVColumn<LCSCPurchaseCSVHeaders> {

@@ -51,4 +51,16 @@ trait TestResources {
         String fileName = new File(classLoaderResource).getName()
         createTemporaryFile(folder, fileName, new File(resource.toURI()).bytes)
     }
+
+    File copyResource(File folder, String classLoaderResource) throws IOException {
+        URL resource = this.getClass().getResource(classLoaderResource);
+
+        String fileName = new File(classLoaderResource).getName()
+        createFile(folder, fileName, new File(resource.toURI()).bytes)
+    }
+
+    File createFile(File directory, String fileName, byte[] content) {
+        File tmpFile = new File(directory, new File(fileName).getName())
+        tmpFile << content
+    }
 }

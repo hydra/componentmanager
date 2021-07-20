@@ -18,7 +18,7 @@ class LCSCPurchaseCSVInputSpec extends Specification {
         and:
             ArrayList<LCSCPurchase> expectedPurchases = [
                 new LCSCPurchase(
-                    lcscPart:'C75549',
+                    supplierPart:'C75549',
                     manufacturerPart: 'MMBT3906,215',
                     manufacturer: 'Nexperia',
                     description: 'PNP 200mA 40V 250mW SOT-23(SOT-23-3) Bipolar Transistors - BJT RoHS',
