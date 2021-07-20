@@ -4,6 +4,9 @@ import com.seriouslypro.csv.*
 import com.seriouslypro.eda.BOMItem
 import com.seriouslypro.pnpconvert.FileTools
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 class PartMapper {
 
     List<PartMapping> partMappings = []
@@ -11,13 +14,34 @@ class PartMapper {
     List<PartMapping> buildOptions(BOMItem bomItem) {
         List<PartMapping> options = partMappings.findAll { partMapping ->
 
-            if (partMapping.namePattern == bomItem.name && partMapping.valuePattern == bomItem.value) {
+            boolean nameMatched = partMapping.namePattern == bomItem.name
+            boolean valueMatched = partMapping.valuePattern == bomItem.value
+
+            if (nameMatched && valueMatched) {
                 return true
             }
-            return false
+
+            Optional<Pattern> namePattern = parsePattern(partMapping.namePattern)
+            Optional<Pattern> valuePattern = parsePattern(partMapping.valuePattern)
+
+            nameMatched |= namePattern.present && bomItem.name ==~ namePattern.get()
+            valueMatched |= valuePattern.present && bomItem.value ==~ valuePattern.get()
+
+            return (nameMatched && valueMatched)
         }
 
         options
+    }
+
+    Optional<Pattern> parsePattern(String s) {
+        String trimmedValue = s.trim()
+
+        Matcher matcher = trimmedValue =~ ~/^\/(.*)\/$/
+        if (!matcher.matches()) {
+            return Optional.empty()
+        }
+        String pattern = matcher[0][1]
+        return Optional.of(Pattern.compile(pattern))
     }
 
     static enum EDAPartMappingCSVColumn implements CSVColumn<EDAPartMappingCSVColumn> {
