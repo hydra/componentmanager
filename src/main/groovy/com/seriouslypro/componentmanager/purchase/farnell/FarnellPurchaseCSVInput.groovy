@@ -78,15 +78,24 @@ class FarnellPurchaseCSVInput extends CSVInput<FarnellPurchase, FarnellPurchaseC
 
             return new FarnellPurchase(
                 supplierPart: rowValues[columnIndex(context, FarnellPurchaseCSVHeaders.ORDER_CODE)].trim(),
-                manufacturerPart: rowValues[columnIndex(context, FarnellPurchaseCSVHeaders.MANUFACTURER_PART)].trim(),
-                manufacturer: rowValues[columnIndex(context, FarnellPurchaseCSVHeaders.MANUFACTURER)].trim(),
-                description: rowValues[columnIndex(context, FarnellPurchaseCSVHeaders.DESCRIPTION)].trim(),
+                manufacturerPart: requireNonEmptyValue(context, rowValues, FarnellPurchaseCSVHeaders.MANUFACTURER_PART),
+                manufacturer: requireNonEmptyValue(context, rowValues, FarnellPurchaseCSVHeaders.MANUFACTURER),
+                description: requireNonEmptyValue(context, rowValues, FarnellPurchaseCSVHeaders.DESCRIPTION),
                 quantity: quantity,
                 price: price,
                 currency: currency.toString(),
                 orderDate: orderDate,
                 orderNumber: rowValues[columnIndex(context, FarnellPurchaseCSVHeaders.ORDER_CONFIRMATION_NUMBER)] as Integer,
             )
+        }
+
+        String requireNonEmptyValue(CSVInputContext context, String[] rowValues, FarnellPurchaseCSVHeaders column) {
+            String value = rowValues[columnIndex(context, column)].trim()
+            if (value.empty) {
+                throw new CSVInput.CSVParseException("Missing data in source file")
+            }
+
+            value
         }
     }
 
