@@ -100,42 +100,19 @@ class BOMCostCalculator {
 
         bomItemOptions.eachWithIndex { BOMItemOption bomItemOption, int i ->
             Optional<Purchase> optionalPurchase = findPurchase(purchases, bomItemOption)
+
+            result.purchaseMapping[bomItemOption] = optionalPurchase
+
             if (optionalPurchase.present) {
                 Purchase purchase = optionalPurchase.get()
-
-                String formattedOrderDate = DateTimeFormatter.ISO_DATE.format(purchase.date)
-                String message = "${bomItemOption.originalItem.name}, ${bomItemOption.originalItem.value}"
-                if (bomItemOption.originalItem != bomItemOption.item) {
-                    message += " -> ${bomItemOption.item.name}, ${bomItemOption.item.value}"
-                }
-                message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Supplier: ${purchase.supplier}, Order reference: ${purchase.orderReference}, Order date: ${formattedOrderDate}, Unit price: ${purchase.unitPrice} ${purchase.currency}"
-
-                System.out.println(message)
 
                 BigDecimal bomItemCost = purchase.unitPrice * bomItemOption.item.quantity
                 if (!result.cost.containsKey(purchase.currency)) {
                     result.cost[purchase.currency] = 0.0
                 }
                 result.cost[purchase.currency] += bomItemCost
-            } else {
-                unmatchedBomItemOptions << bomItemOption
             }
         }
-
-        if (unmatchedBomItemOptions) {
-            System.out.println("Unmatched BOM items")
-            unmatchedBomItemOptions.each { bomItemOption ->
-                System.out.println("${bomItemOption.item.name}, ${bomItemOption.item.value}, ${bomItemOption.item.refdesList}")
-                String indentation = "\t"
-                if (bomItemOption.originalItem != bomItemOption.item) {
-                    System.out.println("${indentation}Substituted from ${bomItemOption.originalItem.name}, ${bomItemOption.originalItem.value}")
-                }
-                bomItemOption.options.eachWithIndex { PartMapping partMapping, int index ->
-                    System.out.println("${indentation}${index} -> Manufacturer: ${partMapping.manufacturer}, Part Code: ${partMapping.partCode}")
-                }
-            }
-        }
-
 
         return result
     }

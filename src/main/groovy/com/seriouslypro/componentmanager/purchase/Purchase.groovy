@@ -1,11 +1,13 @@
 package com.seriouslypro.componentmanager.purchase
 
 import com.seriouslypro.componentmanager.currency.Currency
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 import java.time.LocalDate
 
 @ToString(includeNames = true, includePackage = false)
+@EqualsAndHashCode
 class Purchase {
     LocalDate date
     String orderReference
