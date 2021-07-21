@@ -57,7 +57,7 @@ class PartSubstitutor {
                 def name = rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.NAME)].trim()
                 def value = rowValues[columnIndex(context, EDAPartSubstitutionCSVColumn.VALUE)].trim()
 
-                if (!(namePattern && valuePattern && name && value)) {
+                if (!(namePattern && name)) {
                     throw new CSVInput.CSVParseException("one or more missing values")
                 }
 
