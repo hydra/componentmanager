@@ -1,5 +1,6 @@
 package com.seriouslypro.componentmanager.bom
 
+import au.com.bytecode.opencsv.CSVWriter
 import com.seriouslypro.componentmanager.purchase.Purchase
 import com.seriouslypro.eda.BOMItemOption
 import com.seriouslypro.eda.part.PartMapping
@@ -18,6 +19,7 @@ class BOMCost {
         builder.pm(args:1, argName: 'partmappings', 'part mappings file/url')
         builder.ps(args:1, argName: 'partsubstitutions', 'part substitutions file/url')
         builder.cfg(args:1, argName: 'config', 'configuration file (in "key=value" format)')
+        builder.o(args:1, argName: 'output', 'output file (csv)')
 
         builder.c('calculate')
 
@@ -81,6 +83,10 @@ class BOMCost {
                 )
                 BOMCostResult result = calculator.calculate()
                 dumpBOMCostResult(result)
+
+                if (options.o) {
+                    writeOutputCSV(options.o, result)
+                }
                 return 0
             }
         }
@@ -90,6 +96,40 @@ class BOMCost {
         System.out.println('invalid parameter combinations')
         builder.usage()
         return -1
+    }
+
+    static void writeOutputCSV(String outputFileName, BOMCostResult bomCostResult) {
+        Writer writer = new FileWriter(new File(outputFileName))
+        CSVWriter csvWriter = new CSVWriter(writer)
+        String[] headers = ["NAME", "VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE", "SUPPLIER", "ORDER_REFERENCE", "ORDER_DATE", "UNIT_PRICE", "CURRENCY"]
+        csvWriter.writeNext(headers)
+
+        def matchedBomItemOptions = bomCostResult.purchaseMapping.findAll { k, v -> v.present }
+
+        matchedBomItemOptions.eachWithIndex { BOMItemOption bomItemOption, Optional<Purchase> optionalPurchase, int i ->
+            Purchase purchase = optionalPurchase.get()
+
+            String formattedOrderDate = DateTimeFormatter.ISO_DATE.format(purchase.date)
+
+            String[] values = [
+                bomItemOption.originalItem.name,
+                bomItemOption.originalItem.value,
+                bomItemOption.item.name,
+                bomItemOption.item.value,
+                purchase.manufacturer,
+                purchase.partCode,
+                purchase.supplier,
+                purchase.orderReference,
+                formattedOrderDate,
+                purchase.unitPrice,
+                purchase.currency
+            ]
+
+            csvWriter.writeNext(values)
+        }
+
+
+        csvWriter.close()
     }
 
     static void dumpBOMCostResult(BOMCostResult bomCostResult) {
