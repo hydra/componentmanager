@@ -3,6 +3,7 @@ package com.seriouslypro.componentmanager.purchasecombiner
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.model.*
 import com.seriouslypro.componentmanager.bom.Debug
+import com.seriouslypro.componentmanager.purchase.farnell.FarnellPurchaseCSVInput
 import com.seriouslypro.componentmanager.purchase.lcsc.LCSCDataExtractor
 import com.seriouslypro.componentmanager.purchase.lcsc.LCSCPurchaseCSVInput
 import com.seriouslypro.componentmanager.purchase.lcsc.SupplierPurchase
@@ -22,6 +23,7 @@ class PurchaseCSVProcessor {
     private static final int HEADER_ROW_COUNT = 1
 
     void process(File sourceFile) {
+        System.out.println("Processing file: ${sourceFile.absolutePath}")
         ArrayList<SupplierPurchase> purchases = readPurchases(sourceFile)
         System.out.println(purchases)
 
@@ -134,7 +136,8 @@ class PurchaseCSVProcessor {
 
     enum Supplier {
         LCSC,
-        MOUSER
+        MOUSER,
+        FARNELL
     }
 
     private ArrayList<SupplierPurchase> readPurchases(File sourceFile) {
@@ -149,8 +152,12 @@ class PurchaseCSVProcessor {
                     csvInput = new LCSCPurchaseCSVInput(sourceFile.name, reader)
                     break;
                 case Supplier.MOUSER:
-                    Reader reader =  new InputStreamReader(new FileInputStream(sourceFile), "UTF-8")
+                    Reader reader = makeUTF8Reader(sourceFile)
                     csvInput = new MouserPurchaseCSVInput(sourceFile.name, reader)
+                    break
+                case Supplier.FARNELL:
+                    Reader reader =  makeUTF8Reader(sourceFile)
+                    csvInput = new FarnellPurchaseCSVInput(sourceFile.name, reader)
                     break
             }
 
@@ -191,6 +198,10 @@ class PurchaseCSVProcessor {
         purchases
     }
 
+    private InputStreamReader makeUTF8Reader(File sourceFile) {
+        new InputStreamReader(new FileInputStream(sourceFile), "UTF-8")
+    }
+
     private Reader makeLCSCFileReader(File sourceFile) {
         /*
             The CSV files that LCSC's website generates files like this:
@@ -200,7 +211,7 @@ class PurchaseCSVProcessor {
             The header causes problems for the CSV reader implementation and must be skipped.
          */
 
-        Reader headerReader = new FileReader(sourceFile)
+        Reader headerReader = makeUTF8Reader(sourceFile)
 
         int headerLength = 0
         do {
@@ -213,11 +224,17 @@ class PurchaseCSVProcessor {
                 break
             }
             headerLength++
+
+            boolean quoteNotFound = headerLength >= 3
+            if (quoteNotFound) {
+                headerLength = 0
+                break
+            }
         } while (true)
 
         headerReader.close()
 
-        Reader reader = new FileReader(sourceFile)
+        Reader reader = makeUTF8Reader(sourceFile)
         reader.skip(headerLength)
 
         return reader

@@ -31,6 +31,7 @@ class PurchaseCombinerSpec extends Specification implements TestResources {
         and:
             File sourceDirectoryLCSC = temporaryFolder.newFolder('LCSC')
             File sourceDirectoryMouser = temporaryFolder.newFolder('Mouser')
+            File sourceDirectoryFarnell = temporaryFolder.newFolder('Farnell')
 
         and:
             copyResource(sourceDirectoryLCSC, testResource('/LCSC/20210128VAXS.csv'))
@@ -40,11 +41,15 @@ class PurchaseCombinerSpec extends Specification implements TestResources {
             copyResource(sourceDirectoryMouser, testResource('/Mouser/MouserSearch1216PM.csv'))
 
         and:
+            copyResource(sourceDirectoryFarnell, testResource('/Farnell/78254006-ORDERLINEOrderDetail.csv'))
+
+        and:
             String[] args = [
                 "-u",
                 "-cfg", configFileName,
                 "-sd", sourceDirectoryLCSC,
                 "-sd", sourceDirectoryMouser,
+                "-sd", sourceDirectoryFarnell,
                 "-s", sheetId
             ]
 
