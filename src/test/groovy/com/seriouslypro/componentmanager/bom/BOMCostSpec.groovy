@@ -37,9 +37,9 @@ class BOMCostSpec extends Specification implements TestResources {
 
         and:
             String[] expectedLines = [
-                "CAP_0402, 100nF 6.3V 0402 -> CAP_0402, 100nF 50V 0402 -> Manufacturer: Walsin Tech Corp, Part Code: 0402B104K500CT, Order reference: WM210706790W, Unit price: 0.0024 USD",
-                "CAP_0603, 4.7uF 6.3V 0603 10% -> Manufacturer: Samsung Electro-Mechanics, Part Code: CL10A475KQ8NNNC, Order reference: 20190604YOTN, Unit price: 0.0033 USD",
-                "LED_0603, GREEN -> Manufacturer: BrightLed, Part Code: BL-0603-GREEN-A34, Order reference: 506908342095201, Unit price: 0.0043 GBP"
+                "CAP_0402, 100nF 6.3V 0402 -> CAP_0402, 100nF 50V 0402 -> Manufacturer: Walsin Tech Corp, Part Code: 0402B104K500CT, Supplier: LCSC, Order reference: WM210706790W, Order date: 2021-07-06, Unit price: 0.0024 USD",
+                "CAP_0603, 4.7uF 6.3V 0603 10% -> Manufacturer: Samsung Electro-Mechanics, Part Code: CL10A475KQ8NNNC, Supplier: LCSC, Order reference: 20190604YOTN, Order date: 2019-06-04, Unit price: 0.0033 USD",
+                "LED_0603, GREEN -> Manufacturer: BrightLed, Part Code: BL-0603-GREEN-A34, Supplier: AliExpress, Order reference: 506908342095201, Order date: 2018-10-18, Unit price: 0.0043 GBP"
             ]
 
         when:

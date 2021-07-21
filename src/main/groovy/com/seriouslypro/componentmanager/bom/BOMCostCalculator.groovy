@@ -15,6 +15,8 @@ import com.seriouslypro.eda.part.PartSubstitutor
 import com.seriouslypro.pnpconvert.FileTools
 import groovy.transform.ToString
 
+import java.time.format.DateTimeFormatter
+
 interface BOMItemMatchingStrategy {
     boolean matches(Purchase candidate, BOMItem bomItem)
 }
@@ -101,11 +103,12 @@ class BOMCostCalculator {
             if (optionalPurchase.present) {
                 Purchase purchase = optionalPurchase.get()
 
+                String formattedOrderDate = DateTimeFormatter.ISO_DATE.format(purchase.date)
                 String message = "${bomItemOption.originalItem.name}, ${bomItemOption.originalItem.value}"
                 if (bomItemOption.originalItem != bomItemOption.item) {
                     message += " -> ${bomItemOption.item.name}, ${bomItemOption.item.value}"
                 }
-                message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Order reference: ${purchase.orderReference}, Unit price: ${purchase.unitPrice} ${purchase.currency}"
+                message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Supplier: ${purchase.supplier}, Order reference: ${purchase.orderReference}, Order date: ${formattedOrderDate}, Unit price: ${purchase.unitPrice} ${purchase.currency}"
 
                 System.out.println(message)
 
