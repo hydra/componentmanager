@@ -101,7 +101,7 @@ class BOMCost {
     static void writeOutputCSV(String outputFileName, BOMCostResult bomCostResult) {
         Writer writer = new FileWriter(new File(outputFileName))
         CSVWriter csvWriter = new CSVWriter(writer)
-        String[] headers = ["NAME", "VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE", "SUPPLIER", "ORDER_REFERENCE", "ORDER_DATE", "UNIT_PRICE", "CURRENCY"]
+        String[] headers = ["NAME", "VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE", "SUPPLIER", "ORDER_REFERENCE", "ORDER_DATE", "QUANTITY", "UNIT_PRICE", "LINE_PRICE", "CURRENCY"]
         csvWriter.writeNext(headers)
 
         def matchedBomItemOptions = bomCostResult.purchaseMapping.findAll { k, v -> v.present }
@@ -121,7 +121,9 @@ class BOMCost {
                 purchase.supplier,
                 purchase.orderReference,
                 formattedOrderDate,
+                bomItemOption.item.quantity,
                 purchase.unitPrice,
+                purchase.unitPrice * bomItemOption.item.quantity,
                 purchase.currency
             ]
 
