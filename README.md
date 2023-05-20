@@ -63,7 +63,7 @@ Limitations
 ===========
 PurchaseCombiner
  * Always start with an empty sheet, currently it doesn't handle duplicates and just inserts rows.
- - Only supports LCSC.  Mouser, Farnell, Digikey are planned.
+ - Supports LCSC, Mouser, Farnell.  Digikey is planned.
  + It's still much quicker than doing it manually.
  
 BOMCost
@@ -86,3 +86,16 @@ Installation
 Running
 =======
 Only from IDE at the moment.  Run `main()` in BOMCost.groovy or PurchaseCombiner.groovy
+
+DipTrace Export Settings
+========================
+
+Export a CSV file.
+Group rows by: `Name, Value and Pattern`
+Column divider: `;`
+
+
+Header:
+```csv
+RefDes;"Value";"Name";"Part";"Quantity";"Manufacturer";"Datasheet";"Number of Pins";"Pattern"
+```
