@@ -14,6 +14,18 @@ class PurchaseCombinerSpec extends Specification implements TestResources {
         Example sheet: https://docs.google.com/spreadsheets/d/1ercprkhq2sgZA0bfLPEqt_no3pZPJE9bxUEwaIFa3bo
 
         Requires valid `credentials\test-credentials.json` that grants this application access to suitable spreadsheet
+
+        Get credentials from the Google API Console, see:
+         'APIs and Services' ->
+         'Credentials' ->
+         'OAuth 2.0 Client IDs'.
+
+        Then create one, and download the 'Client secrets' `.json` file and store it as `credentials\test-credentials.json`.
+
+        Reference: https://developers.google.com/api-client-library/java/google-api-java-client/oauth2
+
+        Example: https://console.cloud.google.com/welcome?pli=1&project=component-manager-319920
+
      */
 
     void setup() {
