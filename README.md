@@ -1,12 +1,10 @@
-ComponentManager
-================
+# ComponentManager
 
 by Dominic Clifton. (C) 2018-2021
 
 Utilities to manage costing/pricing for PCB assembly.
 
-Background
-==========
+## Background
 
 When designing PCBs for you often need to know the price or cost of a design, a price when it's a new design and you
 don't have component stock, or cost if you've already purchased components.
@@ -38,8 +36,7 @@ Some EDA tools have BOM-integrations with suppliers, however that creates lock-i
 as well as limiting your choice of components in the EDA tool.  EasyEDA/LCSC/JLPCB being such an example of such lock-in.
 You have to ask yourself, what if I need this made, but JLPCB don't do blind-vias and LCSC doesn't stock the part?
 
-Scope
-=====
+## Scope
 
 The tools in this project seeks to reduce your workload by:
 
@@ -48,8 +45,7 @@ The tools in this project seeks to reduce your workload by:
 * Define a simple format for part substitutions, to allow for component library re-use.
 * Producing a cost, given a BOM, purchase history, mappings and substitution lists.
 
-Supported suppliers
-===================
+## Supported suppliers
 
 * LCSC
 * Mouser
@@ -64,28 +60,77 @@ It's technically possible to support suppliers using their website APIs.
 In practice suppliers generally can't get a simple order history export to CSV working
 so YMMV if you try to use their APIs... See developer notes in the code for examples of broken-ness and pain.
 
-Workflow
-========
+## Workflow
 
 The workflow is currently:
 1) export your past purchases (orders) from supported suppliers (e.g. LCSC) into supported input formats (e.g. CSV) 
-2) run PurchaseCombiner to update a purchase history spreadsheet (e.g. on google sheets via the Google Sheets API) 
+2) create a `.json` client credentials file to allow the tool to access google sheets
+
+Get credentials from the Google API Console, steps:
+* Click 'APIs and Services'
+* Click 'Credentials'
+* Click 'OAuth 2.0 Client IDs'
+* Then create one, and download the 'Client secrets' `.json` file and store it as-required, store as `credentials/user-credentials.json`.
+
+Reference 1: https://developers.google.com/api-client-library/java/google-api-java-client/oauth2
+Reference 2: https://console.cloud.google.com/apis/credentials/oauthclient
+
+Example URL: https://console.cloud.google.com/welcome?pli=1&project=component-manager-319920
+
+3) create a per-user config file for the tool, so it can access google sheets via the API.
+
+```
+sheetId=1DyAAXeNf1tS25ZWaWHjedyReiUt_goo17hTRhCHcDsQ
+credentials=credentials/user-credentials.json
+```
+
+store as `configs/user.config`
+
+The sheetId is the ID of the purchase history spreadsheet that the tool will update.
+
+3) create a config file so you don't have to remember all the command line arguments every time you run the tool:
+
+```
+-u
+-cfg configs/user.config
+#-sd "D:\\My Documents\\Purchasing\\LCSC\\Orders"
+#-sd "D:\\My Documents\\Purchasing\\Mouser\\Part History"
+-sd "D:\\My Documents\\Purchasing\\Farnell\\Orders"
+```
+
+store as `@configs\user.purchasecombiner`
+
+Note: The tool only works with one source directory at a time, enable/disable the source directory
+argument as appropriate by adding/removing the `#` prefix an re-running the tool.
+
+4) run PurchaseCombiner to update a purchase history spreadsheet (e.g. on google sheets via the Google Sheets API) 
 note: currently running purchase combiner multiple times will create duplicate rows in the spreadsheet but is non-destructive, 
 recommended to use version control on the generated file so that it can be reverted if required.
 when using google sheets export you can enable version history for the file in google sheets.
-3) manually append line items to the spreadsheet for purchases from unsupported suppliers.
 
-Then:
+```
+purchasecombiner @configs\user.purchasecombiner
+```
+ 
+5) manually append line items to the spreadsheet for purchases from unsupported suppliers.
 
-4) Export BOM from EDA tool (DipTrace)
-5) create Name + Value to Name + Value part substitutions file for the project (design specific substitutions)
+6) Export BOM from EDA tool (DipTrace)
+
+![DipTrace - BOM Export Settings 1](docs/assets/diptrace/schematic-bom-export-settings-1.png)
+
+![DipTrace - BOM Export Settings 2](docs/assets/diptrace/schematic-bom-export-settings-2.png)
+
+save as CSV file, e.g. `DesignName-RevA-YYYYMMDD-HHMM-BOM.csv`
+
+7) create Name + Value to Name + Value part substitutions spreadsheet in google sheets or a CSV file for the project (design specific substitutions)
 
 e.g.
 ```csv
 "Name";"Value";"Name";"Value"
 "CAP_0402";"2.2uF 6.3V 0402";"CAP_0402";"2.2uF 10V 0402 X5R 10%"
 ```
-6) create Name + Value to Order-code & Manufacturer file for each component to be used. (an EDA to order-code mapping)
+
+8) create Name + Value to Order-code & Manufacturer substitutions spreadsheet in google sheets or a CSV file for each component to be used. (an EDA to order-code mapping)
 
 Regular expressions are supported in the patterns.
 ```csv
@@ -94,7 +139,23 @@ Regular expressions are supported in the patterns.
 "SM04B-SRSS-TB";"/.*/";"AFC10-S04QCC-00";"JUSHUO"
 ```
 
-7) run BOMCost to calculate the cost for the BOM.
+9) create a per-design config file for the tool so it can find all the files.
+
+```
+-c
+-cfg configs/user.config
+-b "D:\\My Documents\\DipTrace\\Projects\\DesignName\\DesignName-RevA-YYYYMMDD-HHMM-BOM.csv"
+-ps https://docs.google.com/spreadsheet/ccc?key=aaaaaaaaaaaa_aaaaaaaaa-aaa-aaaaaaaaaaaaaa-aa&gid=0&output=csv
+-p https://docs.google.com/spreadsheet/ccc?key=bbbbbbbbbbbbbbbbbbbbbbbbbbbb_bbbbbbbbbbbbbbb&gid=0&output=csv
+-pm https://docs.google.com/spreadsheet/ccc?key=cccccccccccccccccccccccccccccccccccccccccccc&gid=dddddddddd&output=csv
+-o "C:\\My Documents\\DipTrace\\Projects\\DesignName\\DesignName-RevA-YYYYMMDD-HHMM-BOM-COST.csv"
+```
+save as `configs/DesignName-RevA-YYYYMMDD-HHMM-BOM.bomcost`
+
+10) run BOMCost to calculate the cost for the BOM, tell it to get the program arguments from a file using the `@` symbol:
+
+`bomcost @configs/DesignName-RevA-YYYYMMDD-HHMM-BOM.bomcost`
+
 it will print out the costs of previously-ordered parts and sum the currencies used.
 e.g.
 
@@ -118,11 +179,11 @@ the resulting CSV file will contain data like this
 
 it's also possible to then:
 
-8) check your inventory against the selected BOM components.
-9) order new/out-of-stock parts, sometimes by uploading the resulting 'bom-cost.csv' to a supplier.
+11) check your inventory against the selected BOM components.
+12) order new/out-of-stock parts, sometimes by uploading the resulting 'bom-cost.csv' to a supplier.
 
-Limitations
-===========
+## Limitations
+
 PurchaseCombiner
  * Doesn't handle duplicates and just inserts rows, see workflow.
  - Digikey and Arrow support is planned.
@@ -131,33 +192,31 @@ PurchaseCombiner
 BOMCost
  - Work-in-progress.
 
-Building
-========
+## Building
 Requires 'pnpconvert' as a sibling to the 'componentmanager' directory so that gradle can find it.
 
-Testing
-=======
+## Testing
 
 `gradlew test`
 
-Installation
-============
+## Installation
 
 `gradlew installDist`
 
-Running
-=======
+## Running
 Only from IDE at the moment.  Run `main()` in BOMCost.groovy or PurchaseCombiner.groovy
 
-DipTrace Export Settings
-========================
+## DipTrace Export Settings
 
 Export a CSV file.
 Group rows by: `Name, Value and Pattern`
 Column divider: `;`
-
+Add Row Number: No
+Add Total Quantity/Price: No
 
 Header:
 ```csv
 RefDes;"Value";"Name";"Part";"Quantity";"Manufacturer";"Datasheet";"Number of Pins";"Pattern"
 ```
+
+Also screenshots in [Workflow](#workflow) above.
