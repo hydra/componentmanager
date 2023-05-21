@@ -15,7 +15,7 @@ Often you will buy more components than you need because they have minimum order
 a fixed amount.  When this happens you seek to use these components before either changing to a different component
 or simply ordering more.
 
-EDA tools, like DipTrace often don't use a specific part because in many cased multiple suppliers can provide parts.
+EDA tools, like DipTrace often don't use a specific part because in many cases multiple suppliers can provide parts.
 For example, you often specify the minimum specification, such as 100nF 6.3V 20% capacitor, but in reality you can often
 use a higher specification part, such as a 100nF 50V 10% capacitor.
 
@@ -32,7 +32,11 @@ Given the above, what you end up with is a time-consuming nightmare of manually 
 sources which cannot be easily updated.
 
 Also, if the process of getting a price is complicated, then it makes the practice of design-to-a-price much more
-difficult as you cannot easily see how adding components changes the price.  
+difficult as you cannot easily see how adding components changes the price.
+
+Some EDA tools have BOM-integrations with suppliers, however that creates lock-in in both the EDA tool and supplier list,
+as well as limiting your choice of components in the EDA tool.  EasyEDA/LCSC/JLPCB being such an example of such lock-in.
+You have to ask yourself, what if I need this made, but JLPCB don't do blind-vias and LCSC doesn't stock the part?
 
 Scope
 =====
