@@ -55,9 +55,47 @@ Then:
 
 1) Export BOM from EDA tool (DipTrace)
 2) create Name + Value to Name + Value part substitutions file for the project (design specific substitutions)
+
+e.g.
+```csv
+"Name";"Value";"Name";"Value"
+"CAP_0402";"2.2uF 6.3V 0402";"CAP_0402";"2.2uF 10V 0402 X5R 10%"
+```
 3) create Name + Value to Order-code & Manufacturer file for each component to be used. (an EDA to order-code mapping)
-4) run BOMCost to calculate the cost for the BOM.
-5) repeat as required.
+
+Regular expressions are supported in the patterns.
+```csv
+"Name Pattern";"Value Pattern";"Part Code";"Manufacturer"
+"CAP_0402";"2.2uF 10V 0402 X5R 10%";"CL05A225KP5NSNC";"Samsung Electro-Mechanics"
+"SM04B-SRSS-TB";"/.*/";"AFC10-S04QCC-00";"JUSHUO"
+```
+
+5) run BOMCost to calculate the cost for the BOM.
+it will print out the costs of previously-ordered parts and sum the currencies used.
+e.g.
+
+```
+CAP_0402, 2.2uF 6.3V 0402 -> CAP_0402, 2.2uF 10V 0402 X5R 10% -> Manufacturer: Samsung Electro-Mechanics, Part Code: CL05A225KP5NSNC, Supplier: LCSC, Order reference: 20200101AAAA, Order date: 2020-01-01, Unit price: 0.0034 USD
+SM04B-SRSS-TB, RX -> Manufacturer: JUSHUO, Part Code: AFC10-S04QCC-00, Supplier: LCSC, Order reference: 20210101BBBB, Order date: 2021-01-01, Unit price: 0.0444 USD
+RES_0402, 1K 0402 5% -> Manufacturer: TE CONNECTIVITY, Part Code: CRGCQ0402J1K0, Supplier: Farnell, Order reference: 12344321, Order date: 2019-01-01, Unit price: 0.0020 EUR
+Unmatched BOM items
+CAP_0402, 4.7uF 6.3V 0402 X5R 10%, [C4, C11]
+	Substituted from CAP_0402, 4.7uF 6.3V 0402 10%
+	0 -> Manufacturer: YAGEO, Part Code: CC0402KRX5R5BB475
+SOLDER_PAD, , [SP7, SP8]
+Cost: [USD:9.9999, EUR:8.8888, GBP:7.7777]
+```
+
+the resulting CSV file will contain data like this 
+```csv
+"REFDES", "NAME","VALUE","SUBSTITUTE_NAME","SUBSTITUTE_VALUE","MANUFACTURER","PART_CODE","SUPPLIER","ORDER_REFERENCE","ORDER_DATE","QUANTITY","UNIT_PRICE","LINE_PRICE","CURRENCY"
+"C1, C2","CAP_0402","2.2uF 6.3V 0402","CAP_0402","2.2uF 10V 0402 X5R 10%","Samsung Electro-Mechanics","CL05A225KP5NSNC","LCSC","2020101AAAA","2020-01-01","3","0.0034","0.0102","USD"
+```
+
+it's also possible to then:
+
+6) check your inventory against the selected BOM components.
+7) order new/out-of-stock parts, sometimes by uploading the resulting 'bom-cost.csv' to a supplier.
 
 Limitations
 ===========
