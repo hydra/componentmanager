@@ -101,7 +101,7 @@ class BOMCost {
     static void writeOutputCSV(String outputFileName, BOMCostResult bomCostResult) {
         Writer writer = new FileWriter(new File(outputFileName))
         CSVWriter csvWriter = new CSVWriter(writer)
-        String[] headers = ["NAME", "VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE", "SUPPLIER", "ORDER_REFERENCE", "ORDER_DATE", "QUANTITY", "UNIT_PRICE", "LINE_PRICE", "CURRENCY"]
+        String[] headers = ["REFDES", "NAME", "VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE", "SUPPLIER", "ORDER_REFERENCE", "ORDER_DATE", "QUANTITY", "UNIT_PRICE", "LINE_PRICE", "CURRENCY"]
         csvWriter.writeNext(headers)
 
         def matchedBomItemOptions = bomCostResult.purchaseMapping.findAll { k, v -> v.present }
@@ -112,6 +112,7 @@ class BOMCost {
             String formattedOrderDate = DateTimeFormatter.ISO_DATE.format(purchase.date)
 
             String[] values = [
+                bomItemOption.item.refdesList.join(', '),
                 bomItemOption.originalItem.name,
                 bomItemOption.originalItem.value,
                 bomItemOption.item.name,
@@ -146,7 +147,7 @@ class BOMCost {
             if (bomItemOption.originalItem != bomItemOption.item) {
                 message += " -> ${bomItemOption.item.name}, ${bomItemOption.item.value}"
             }
-            message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Supplier: ${purchase.supplier}, Order reference: ${purchase.orderReference}, Order date: ${formattedOrderDate}, Unit price: ${purchase.unitPrice} ${purchase.currency}"
+            message += " -> Manufacturer: ${purchase.manufacturer}, Part Code: ${purchase.partCode}, Supplier: ${purchase.supplier}, Order reference: ${purchase.orderReference}, Order date: ${formattedOrderDate}, Unit price: ${purchase.unitPrice} ${purchase.currency}, RefDes: ${bomItemOption.item.refdesList}"
 
             System.out.println(message)
         }
