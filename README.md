@@ -1,6 +1,6 @@
 # ComponentManager
 
-by Dominic Clifton. (C) 2018-2021
+by Dominic Clifton. (C) 2018-2023
 
 Utilities to manage costing/pricing for PCB assembly.
 
@@ -217,7 +217,7 @@ The tools can be run with no aguments and they will print the help.
 ### BOMCost
 
 ```
-BOMCost (C) 2021 Dominic Clifton
+BOMCost (C) 2023 Dominic Clifton
 Written by Dominic Clifton
 Usage: bomcost
 -b=<bom>                 BOM file/url
@@ -234,7 +234,7 @@ part substitutions file/url
 ### Purchase Combiner
 
 ```
-PurchaseCombiner (C) 2021 Dominic Clifton
+PurchaseCombiner (C) 2023 Dominic Clifton
 Written by Dominic Clifton
 Usage: purchasecombiner
   -c=<credentials>    credentials json file/url

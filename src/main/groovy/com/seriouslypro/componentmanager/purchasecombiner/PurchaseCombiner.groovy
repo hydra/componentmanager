@@ -84,7 +84,7 @@ class PurchaseCombiner {
     }
 
     private static void about() {
-        System.out.println('PurchaseCombiner (C) 2021 Dominic Clifton')
+        System.out.println('PurchaseCombiner (C) 2023 Dominic Clifton')
         System.out.println('Written by Dominic Clifton')
     }
 }
