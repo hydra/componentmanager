@@ -44,24 +44,44 @@ The tools in this project seeks to reduce your workload by:
 * Define a simple format for part substitutions, to allow for component library re-use.
 * Producing a cost, given a BOM, purchase history, mappings and substitution lists.
 
+Supported suppliers
+===================
+
+* LCSC
+* Mouser
+* Farnell
+
+Supported for other suppliers is planned.
+Adding a supplier support is reasonably straightforward though as long as the supplier's website allows you to export one
+or more CSV files containing: order date, supplier reference, manufacturer reference, manufacturer, cost and currency. 
+The order reference also needs to be determined, usually either from the filename or from the data in the exported file. 
+
+It's technically possible to support suppliers using their website APIs.
+In practice suppliers generally can't get a simple order history export to CSV working
+so YMMV if you try to use their APIs... See developer notes in the code for examples of broken-ness and pain.
+
 Workflow
 ========
 
 The workflow is currently:
 1) export your past purchases (orders) from supported suppliers (e.g. LCSC) into supported input formats (e.g. CSV) 
-2) run PurchaseCombiner to update the purchase history.
+2) run PurchaseCombiner to update a purchase history spreadsheet (e.g. on google sheets via the Google Sheets API) 
+note: currently running purchase combiner multiple times will create duplicate rows in the spreadsheet but is non-destructive, 
+recommended to use version control on the generated file so that it can be reverted if required.
+when using google sheets export you can enable version history for the file in google sheets.
+3) manually append line items to the spreadsheet for purchases from unsupported suppliers.
 
 Then:
 
-1) Export BOM from EDA tool (DipTrace)
-2) create Name + Value to Name + Value part substitutions file for the project (design specific substitutions)
+4) Export BOM from EDA tool (DipTrace)
+5) create Name + Value to Name + Value part substitutions file for the project (design specific substitutions)
 
 e.g.
 ```csv
 "Name";"Value";"Name";"Value"
 "CAP_0402";"2.2uF 6.3V 0402";"CAP_0402";"2.2uF 10V 0402 X5R 10%"
 ```
-3) create Name + Value to Order-code & Manufacturer file for each component to be used. (an EDA to order-code mapping)
+6) create Name + Value to Order-code & Manufacturer file for each component to be used. (an EDA to order-code mapping)
 
 Regular expressions are supported in the patterns.
 ```csv
@@ -70,7 +90,7 @@ Regular expressions are supported in the patterns.
 "SM04B-SRSS-TB";"/.*/";"AFC10-S04QCC-00";"JUSHUO"
 ```
 
-5) run BOMCost to calculate the cost for the BOM.
+7) run BOMCost to calculate the cost for the BOM.
 it will print out the costs of previously-ordered parts and sum the currencies used.
 e.g.
 
@@ -94,14 +114,14 @@ the resulting CSV file will contain data like this
 
 it's also possible to then:
 
-6) check your inventory against the selected BOM components.
-7) order new/out-of-stock parts, sometimes by uploading the resulting 'bom-cost.csv' to a supplier.
+8) check your inventory against the selected BOM components.
+9) order new/out-of-stock parts, sometimes by uploading the resulting 'bom-cost.csv' to a supplier.
 
 Limitations
 ===========
 PurchaseCombiner
- * Always start with an empty sheet, currently it doesn't handle duplicates and just inserts rows.
- - Supports LCSC, Mouser, Farnell.  Digikey is planned.
+ * Doesn't handle duplicates and just inserts rows, see workflow.
+ - Digikey and Arrow support is planned.
  + It's still much quicker than doing it manually.
  
 BOMCost
