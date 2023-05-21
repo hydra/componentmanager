@@ -100,6 +100,8 @@ The sheetId is the ID of the purchase history spreadsheet that the tool will upd
 
 store as `@configs\user.purchasecombiner`
 
+Refer to [command line arguments](#command-line-arguments) below.
+
 Note: The tool only works with one source directory at a time, enable/disable the source directory
 argument as appropriate by adding/removing the `#` prefix an re-running the tool.
 
@@ -151,6 +153,8 @@ Regular expressions are supported in the patterns.
 -o "C:\\My Documents\\DipTrace\\Projects\\DesignName\\DesignName-RevA-YYYYMMDD-HHMM-BOM-COST.csv"
 ```
 save as `configs/DesignName-RevA-YYYYMMDD-HHMM-BOM.bomcost`
+
+Refer to [command line arguments](#command-line-arguments) below.
 
 10) run BOMCost to calculate the cost for the BOM, tell it to get the program arguments from a file using the `@` symbol:
 
@@ -205,6 +209,42 @@ Requires 'pnpconvert' as a sibling to the 'componentmanager' directory so that g
 
 ## Running
 Only from IDE at the moment.  Run `main()` in BOMCost.groovy or PurchaseCombiner.groovy
+
+## Command line arguments
+
+The tools can be run with no aguments and they will print the help.
+
+### BOMCost
+
+```
+BOMCost (C) 2021 Dominic Clifton
+Written by Dominic Clifton
+Usage: bomcost
+-b=<bom>                 BOM file/url
+-c                       calculate
+-cfg=<config>        configuration file (in "key=value" format)
+-o=<output>              output file (csv)
+-p=<purchases>           purchases file/url
+-pm=<partmappings>   part mappings file/url
+-ps=<partsubstitutions>
+part substitutions file/url
+-v                       version
+```
+
+### Purchase Combiner
+
+```
+PurchaseCombiner (C) 2021 Dominic Clifton
+Written by Dominic Clifton
+Usage: purchasecombiner
+  -c=<credentials>    credentials json file/url
+      -cfg=<config>   configuration file (in "key=value" format)
+  -s=<sheet>          sheet id
+      -sd=<sourceDirectory>
+                      source directory
+  -u                  update
+  -v                  version
+```
 
 ## DipTrace Export Settings
 
