@@ -9,6 +9,16 @@ import groovy.transform.ToString
 import java.time.LocalDate
 import java.util.regex.Matcher
 
+/**
+ * Generate CSV from mouser website.
+ * "Order History - Part History / Search"
+ * Set page to 100 per page, or more if you can.
+ * Click "Export this page to Excel" ON EACH PAGE.
+ * Save each file to a folder.
+ * For each file, load into Excel the save as .CSV.
+ *
+ * Point the tool at the folder containing the .CSV files.
+ */
 @ToString(includeNames = true, includePackage = false, includeSuperProperties = true)
 @EqualsAndHashCode
 class MouserPurchase extends SupplierPurchase {
