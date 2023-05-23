@@ -21,8 +21,8 @@ class PartMapper {
                 return true
             }
 
-            Optional<Pattern> namePattern = parsePattern(partMapping.namePattern)
-            Optional<Pattern> valuePattern = parsePattern(partMapping.valuePattern)
+            Optional<Pattern> namePattern = PatternParser.parsePattern(partMapping.namePattern)
+            Optional<Pattern> valuePattern = PatternParser.parsePattern(partMapping.valuePattern)
 
             nameMatched |= namePattern.present && bomItem.name ==~ namePattern.get()
             valueMatched |= valuePattern.present && bomItem.value ==~ valuePattern.get()
@@ -31,17 +31,6 @@ class PartMapper {
         }
 
         options
-    }
-
-    Optional<Pattern> parsePattern(String s) {
-        String trimmedValue = s.trim()
-
-        Matcher matcher = trimmedValue =~ ~/^\/(.*)\/$/
-        if (!matcher.matches()) {
-            return Optional.empty()
-        }
-        String pattern = matcher[0][1]
-        return Optional.of(Pattern.compile(pattern))
     }
 
     static enum EDAPartMappingCSVColumn implements CSVColumn<EDAPartMappingCSVColumn> {

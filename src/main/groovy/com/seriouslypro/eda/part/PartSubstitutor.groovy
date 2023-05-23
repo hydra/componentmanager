@@ -4,6 +4,9 @@ import com.seriouslypro.csv.*
 import com.seriouslypro.eda.BOMItem
 import com.seriouslypro.pnpconvert.FileTools
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 class PartSubstitutor {
 
     List<PartSubstitution> partSubstitutions = []
@@ -11,10 +14,20 @@ class PartSubstitutor {
     List<PartSubstitution> findSubstitutions(BOMItem bomItem) {
         List<PartSubstitution> options = partSubstitutions.findAll { partSubstitution ->
 
-            if (partSubstitution.namePattern == bomItem.name && partSubstitution.valuePattern == bomItem.value) {
+            boolean nameMatched =  partSubstitution.namePattern == bomItem.name
+            boolean valueMatched = partSubstitution.valuePattern == bomItem.value
+
+            if (nameMatched && valueMatched) {
                 return true
             }
-            return false
+
+            Optional<Pattern> namePattern = PatternParser.parsePattern(partSubstitution.namePattern)
+            Optional<Pattern> valuePattern = PatternParser.parsePattern(partSubstitution.valuePattern)
+
+            nameMatched |= namePattern.present && bomItem.name ==~ namePattern.get()
+            valueMatched |= valuePattern.present && bomItem.value ==~ valuePattern.get()
+
+            return (nameMatched && valueMatched)
         }
 
         options
