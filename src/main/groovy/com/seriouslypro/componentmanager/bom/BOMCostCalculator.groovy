@@ -38,7 +38,7 @@ interface BOMOptionMatchingStrategy {
 class ExactOptionMatchingStrategy implements BOMOptionMatchingStrategy {
 
     boolean matches(Purchase candidate, PartMapping partMapping) {
-        candidate.partCode == partMapping.partCode && candidate.manufacturer == partMapping.manufacturer
+        candidate.partCode == partMapping.partCode && candidate.manufacturer.toLowerCase() == partMapping.manufacturer.toLowerCase()
     }
 }
 
