@@ -148,11 +148,11 @@ class PurchaseCSVProcessor {
         Supplier supplier = Supplier.find { supplier ->
             switch (supplier) {
                 case Supplier.LCSC:
-                    Reader reader = makeLCSCFileReader(sourceFile)
+                    Reader reader = makeGarbageSkippingFileReader(sourceFile)
                     csvInput = new LCSCPurchaseCSVInput(sourceFile.name, reader)
                     break;
                 case Supplier.MOUSER:
-                    Reader reader = makeUTF8Reader(sourceFile)
+                    Reader reader = makeGarbageSkippingFileReader(sourceFile)
                     csvInput = new MouserPurchaseCSVInput(sourceFile.name, reader)
                     break
                 case Supplier.FARNELL:
@@ -202,17 +202,20 @@ class PurchaseCSVProcessor {
         new InputStreamReader(new FileInputStream(sourceFile), "UTF-8")
     }
 
-    private Reader makeLCSCFileReader(File sourceFile) {
+    private Reader makeGarbageSkippingFileReader(File sourceFile) {
         /*
             The CSV files that LCSC's website generates files like this:
 
             <Header="0xEFBBBF"><CSV data...><EOF>
 
             The header causes problems for the CSV reader implementation and must be skipped.
+
+            The same was observed in a Mouser XLS file saved as CSV by Excel 2016...
          */
 
         Reader headerReader = makeUTF8Reader(sourceFile)
 
+        int unprintableCharacterCount = 0
         int headerLength = 0
         do {
             char[] c = new char[1]
@@ -225,9 +228,13 @@ class PurchaseCSVProcessor {
             }
             headerLength++
 
+            if (c[0] < 32 || c[0] > 127) {
+                unprintableCharacterCount ++
+            }
+
             boolean quoteNotFound = headerLength >= 3
             if (quoteNotFound) {
-                headerLength = 0
+                headerLength = unprintableCharacterCount
                 break
             }
         } while (true)
