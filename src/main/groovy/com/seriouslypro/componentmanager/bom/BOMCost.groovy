@@ -20,6 +20,7 @@ class BOMCost {
         builder.ps(args:1, argName: 'partsubstitutions', 'part substitutions file/url')
         builder.cfg(args:1, argName: 'config', 'configuration file (in "key=value" format)')
         builder.o(args:1, argName: 'output', 'output file (csv)')
+        builder.os(args:1, argName: 'outputsubstitutions', 'output substitutions file (csv)')
 
         builder.c('calculate')
 
@@ -87,6 +88,10 @@ class BOMCost {
                 if (options.o) {
                     writeOutputCSV(options.o, result)
                 }
+
+                if (options.os) {
+                    writeSubstitutionsSCV(options.os, result)
+                }
                 return 0
             }
         }
@@ -145,6 +150,47 @@ class BOMCost {
             csvWriter.writeNext(values)
         }
 
+        csvWriter.close()
+    }
+
+
+    static void writeSubstitutionsSCV(String outputFileName, BOMCostResult bomCostResult) {
+        Writer writer = new FileWriter(new File(outputFileName))
+        CSVWriter csvWriter = new CSVWriter(writer)
+        String[] headers = ["LINE_TYPE", "REFDES", "QUANTITY", "ORIGINAL_NAME", "ORIGINAL_VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE"]
+        csvWriter.writeNext(headers)
+
+        bomCostResult.purchaseMapping.each {bomItemOption, optionalPurchase ->
+
+            String[] values = [
+                "ORIGINAL",
+                bomItemOption.item.refdesList.join(', '),
+                bomItemOption.item.quantity,
+                bomItemOption.originalItem.name,
+                bomItemOption.originalItem.value
+            ]
+
+            csvWriter.writeNext(values)
+
+            bomItemOption.options.eachWithIndex { PartMapping partMapping, int index ->
+
+                ArrayList<String> substitutionValues = [
+                    "SUBSTITUTION",
+                    "",
+                    "",
+                    "",
+                    ""
+                ]
+
+                substitutionValues.addAll([
+                    bomItemOption.item.name,
+                    bomItemOption.item.value,
+                    partMapping.manufacturer,
+                    partMapping.partCode
+                ])
+                csvWriter.writeNext(substitutionValues as String[])
+            }
+        }
         csvWriter.close()
     }
 
