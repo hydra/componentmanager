@@ -101,7 +101,7 @@ class BOMCost {
     static void writeOutputCSV(String outputFileName, BOMCostResult bomCostResult) {
         Writer writer = new FileWriter(new File(outputFileName))
         CSVWriter csvWriter = new CSVWriter(writer)
-        String[] headers = ["REFDES", "NAME", "VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE", "SUPPLIER", "ORDER_REFERENCE", "ORDER_DATE", "QUANTITY", "UNIT_PRICE", "LINE_PRICE", "CURRENCY"]
+        String[] headers = ["REFDES", "QUANTITY", "NAME", "VALUE", "SUBSTITUTE_NAME", "SUBSTITUTE_VALUE", "MANUFACTURER", "PART_CODE", "SUPPLIER", "ORDER_REFERENCE", "ORDER_DATE", "UNIT_PRICE", "LINE_PRICE", "CURRENCY"]
         csvWriter.writeNext(headers)
 
         def matchedBomItemOptions = bomCostResult.purchaseMapping.findAll { k, v -> v.present }
@@ -113,6 +113,7 @@ class BOMCost {
 
             String[] values = [
                 bomItemOption.item.refdesList.join(', '),
+                bomItemOption.item.quantity,
                 bomItemOption.originalItem.name,
                 bomItemOption.originalItem.value,
                 bomItemOption.item.name,
@@ -122,15 +123,27 @@ class BOMCost {
                 purchase.supplier,
                 purchase.orderReference,
                 formattedOrderDate,
-                bomItemOption.item.quantity,
                 purchase.unitPrice,
                 purchase.unitPrice * bomItemOption.item.quantity,
                 purchase.currency
             ]
-
             csvWriter.writeNext(values)
         }
 
+        def unmatchedBomItemOptions = bomCostResult.purchaseMapping.findResults { k, v -> !v.present ? k : null }
+
+        unmatchedBomItemOptions.each { bomItemOption ->
+
+            String[] values = [
+                bomItemOption.item.refdesList.join(', '),
+                bomItemOption.item.quantity,
+                bomItemOption.originalItem.name,
+                bomItemOption.originalItem.value,
+                bomItemOption.item.name,
+                bomItemOption.item.value
+            ]
+            csvWriter.writeNext(values)
+        }
 
         csvWriter.close()
     }

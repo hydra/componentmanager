@@ -39,6 +39,9 @@ class BOMCostSpec extends Specification implements TestResources {
                 "-o", outputCSVFile.absolutePath
             ]
 
+            // TODO unmatched entries
+            // TODO substitutes file
+
         and:
             String[] expectedLines = [
                 "CAP_0402, 100nF 6.3V 0402 -> CAP_0402, 100nF 50V 0402 -> Manufacturer: Walsin Tech Corp, Part Code: 0402B104K500CT, Supplier: LCSC, Order reference: WM210706790W, Order date: 2021-07-06, Unit price: 0.0024 USD",
@@ -47,10 +50,10 @@ class BOMCostSpec extends Specification implements TestResources {
             ]
 
         and:
-            String outputCSVContent = '''"REFDES","NAME","VALUE","SUBSTITUTE_NAME","SUBSTITUTE_VALUE","MANUFACTURER","PART_CODE","SUPPLIER","ORDER_REFERENCE","ORDER_DATE","QUANTITY","UNIT_PRICE","LINE_PRICE","CURRENCY"
-"C1, C2, C5, C7, C9, C11, C12, C21, C22, C26, C29, C35","CAP_0402","100nF 6.3V 0402","CAP_0402","100nF 50V 0402","Walsin Tech Corp","0402B104K500CT","LCSC","WM210706790W","2021-07-06","12","0.0024","0.0288","USD"
-"C3, C8, C23","CAP_0603","4.7uF 6.3V 0603 10%","CAP_0603","4.7uF 6.3V 0603 10%","Samsung Electro-Mechanics","CL10A475KQ8NNNC","LCSC","20190604YOTN","2019-06-04","3","0.0033","0.0099","USD"
-"D1, D2","LED_0603","GREEN","LED_0603","GREEN","BrightLed","BL-0603-GREEN-A34","AliExpress","506908342095201","2018-10-18","2","0.0043","0.0086","GBP"
+            String outputCSVContent = '''"REFDES","QUANTITY","NAME","VALUE","SUBSTITUTE_NAME","SUBSTITUTE_VALUE","MANUFACTURER","PART_CODE","SUPPLIER","ORDER_REFERENCE","ORDER_DATE","UNIT_PRICE","LINE_PRICE","CURRENCY"
+"C1, C2, C5, C7, C9, C11, C12, C21, C22, C26, C29, C35","12","CAP_0402","100nF 6.3V 0402","CAP_0402","100nF 50V 0402","Walsin Tech Corp","0402B104K500CT","LCSC","WM210706790W","2021-07-06","0.0024","0.0288","USD"
+"C3, C8, C23","3","CAP_0603","4.7uF 6.3V 0603 10%","CAP_0603","4.7uF 6.3V 0603 10%","Samsung Electro-Mechanics","CL10A475KQ8NNNC","LCSC","20190604YOTN","2019-06-04","0.0033","0.0099","USD"
+"D1, D2","2","LED_0603","GREEN","LED_0603","GREEN","BrightLed","BL-0603-GREEN-A34","AliExpress","506908342095201","2018-10-18","0.0043","0.0086","GBP"
 '''
 
         when:
