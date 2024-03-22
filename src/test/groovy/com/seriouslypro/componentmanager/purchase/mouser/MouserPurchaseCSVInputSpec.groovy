@@ -1,9 +1,7 @@
 package com.seriouslypro.componentmanager.purchase.mouser
 
-import com.seriouslypro.componentmanager.purchase.lcsc.SupplierPurchase
 import com.seriouslypro.csv.CSVInput
 import com.seriouslypro.csv.CSVInputContext
-import com.seriouslypro.eda.BOMItem
 import spock.lang.Specification
 
 import java.time.LocalDate

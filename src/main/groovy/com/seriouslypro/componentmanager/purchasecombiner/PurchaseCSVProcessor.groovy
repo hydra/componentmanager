@@ -3,11 +3,13 @@ package com.seriouslypro.componentmanager.purchasecombiner
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.model.*
 import com.seriouslypro.componentmanager.bom.Debug
+import com.seriouslypro.componentmanager.purchase.digikey.DigikeyDataExtractor
 import com.seriouslypro.componentmanager.purchase.farnell.FarnellPurchaseCSVInput
 import com.seriouslypro.componentmanager.purchase.lcsc.LCSCDataExtractor
 import com.seriouslypro.componentmanager.purchase.lcsc.LCSCPurchaseCSVInput
-import com.seriouslypro.componentmanager.purchase.lcsc.SupplierPurchase
 import com.seriouslypro.componentmanager.purchase.mouser.MouserPurchaseCSVInput
+import com.seriouslypro.componentmanager.purchase.digikey.DigikeyPurchaseCSVInput
+import com.seriouslypro.componentmanager.purchase.SupplierPurchase
 import com.seriouslypro.csv.CSVInput
 import com.seriouslypro.csv.CSVInput.CSVParseException
 import com.seriouslypro.csv.CSVInputContext
@@ -137,10 +139,11 @@ class PurchaseCSVProcessor {
     enum Supplier {
         LCSC,
         MOUSER,
-        FARNELL
+        FARNELL,
+        DIGIKEY,
     }
 
-    private ArrayList<SupplierPurchase> readPurchases(File sourceFile) {
+    private ArrayList<com.seriouslypro.componentmanager.purchase.SupplierPurchase> readPurchases(File sourceFile) {
 
         List<Exception> exceptions = []
         CSVInput csvInput
@@ -158,6 +161,10 @@ class PurchaseCSVProcessor {
                 case Supplier.FARNELL:
                     Reader reader =  makeUTF8Reader(sourceFile)
                     csvInput = new FarnellPurchaseCSVInput(sourceFile.name, reader)
+                    break
+                case Supplier.DIGIKEY:
+                    Reader reader =  makeUTF8Reader(sourceFile)
+                    csvInput = new DigikeyPurchaseCSVInput(sourceFile.name, reader)
                     break
             }
 
@@ -179,21 +186,19 @@ class PurchaseCSVProcessor {
         ArrayList<SupplierPurchase> purchases = []
         csvInput.parseLines { CSVInputContext context, SupplierPurchase purchase, String[] line ->
 
+            // For now, we repeat this for every purchase, a later refactoring should seek to remove both the switch statements in this method.
+            // TODO move the orderDate error handling to the 'getOrderDate' methods
             switch(supplier) {
                 case Supplier.LCSC:
-                    // For now, we repeat this for every purchase, a later refactoring should seek to remove both the switch statements in this method.
                     LCSCDataExtractor lcscDataExtractor = new LCSCDataExtractor(fileName: sourceFile.name)
-
                     purchase.orderNumber = lcscDataExtractor.getOrderNumber()
-                    if (!purchase.orderNumber) {
-                        throw new RuntimeException("Unable to extract order number from filename, ensure the filename is the same as the order number, file: '$sourceFile'")
-                    }
-
                     purchase.orderDate = lcscDataExtractor.getOrderDate()
-                    if (!purchase.orderDate) {
-                        throw new RuntimeException("Unable to extract order date from filename, ensure the filename is the same as the order number, which should contain a date, e.g. WM2401170052.csv = 2024/01/17, file: '$sourceFile'")
-                    }
 
+                    break;
+                case Supplier.DIGIKEY:
+                    DigikeyDataExtractor digikeyDataExtractor = new DigikeyDataExtractor(fileName: sourceFile.name)
+                    purchase.orderNumber = digikeyDataExtractor.getOrderNumber()
+                    purchase.orderDate = digikeyDataExtractor.getOrderDate()
                     break;
             }
 

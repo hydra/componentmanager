@@ -1,7 +1,6 @@
 package com.seriouslypro.componentmanager.purchase.mouser
 
 import com.seriouslypro.componentmanager.currency.Currency
-import com.seriouslypro.componentmanager.purchase.lcsc.SupplierPurchase
 import com.seriouslypro.csv.*
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
@@ -23,7 +22,7 @@ import java.util.regex.Matcher
  */
 @ToString(includeNames = true, includePackage = false, includeSuperProperties = true)
 @EqualsAndHashCode(callSuper = true)
-class MouserPurchase extends SupplierPurchase {
+class MouserPurchase extends com.seriouslypro.componentmanager.purchase.SupplierPurchase {
     String supplier = 'Mouser'
 }
 

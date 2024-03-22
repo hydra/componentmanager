@@ -1,18 +1,16 @@
-package com.seriouslypro.componentmanager.purchase.lcsc
+package com.seriouslypro.componentmanager.purchase.digikey
 
 import java.time.LocalDate
 import java.util.regex.Pattern
 
-class LCSCDataExtractor {
+class DigikeyDataExtractor {
     String fileName
 
     LocalDate getOrderDate() {
-
         // Pattern specification: https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
         // Named group example: https://e.printstacktrace.blog/groovy-regular-expressions-the-definitive-guide/
         Map<String, String> regexToDatePatternMap = [
-            (~/^(?<date>\d{8}).*/) : "yyyyMMdd",
-            (~/^.*?(?<date>\d{6}).*/) : "yyMMdd"
+                (~/^.*?_(?<date>\d{8})\..*/) : "yyyyMMdd",
         ]
 
         LocalDate date = regexToDatePatternMap.findResult { Pattern regex, String datePattern ->
@@ -27,16 +25,16 @@ class LCSCDataExtractor {
             }
         }
         if (!date) {
-            throw new IllegalArgumentException("Unable to extract order date from filename, ensure the filename is the same as the order number, which should contain a date, e.g. WM2401170052.csv = 2024/01/17, file: '$fileName'")
+            throw new IllegalArgumentException("unable to extract order date from filename, format should be 'DK_PRODUCTS_<order>_<YYYYMMDD>.csv', file: '$fileName'")
         }
         date
     }
 
     String getOrderNumber() {
         try {
-            fileName.split(/\./).first()
+            fileName.split(/_/)[2]
         } catch (e) {
-            throw new IllegalArgumentException("Unable to extract order number from filename, ensure the filename is the same as the order number, file: '$fileName'", e)
+            throw new IllegalArgumentException("unable to extract order number from filename, format should be 'DK_PRODUCTS_<order>_<YYYYMMDD>.csv', file: '$fileName'", e)
         }
     }
 }

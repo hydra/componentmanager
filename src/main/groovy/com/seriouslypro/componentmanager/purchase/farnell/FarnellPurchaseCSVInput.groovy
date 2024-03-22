@@ -1,7 +1,6 @@
 package com.seriouslypro.componentmanager.purchase.farnell
 
 import com.seriouslypro.componentmanager.currency.Currency
-import com.seriouslypro.componentmanager.purchase.lcsc.SupplierPurchase
 import com.seriouslypro.csv.*
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
@@ -37,7 +36,7 @@ import java.util.regex.Matcher
 
 @ToString(includeNames = true, includePackage = false, includeSuperProperties = true)
 @EqualsAndHashCode(callSuper = true)
-class FarnellPurchase extends SupplierPurchase {
+class FarnellPurchase extends com.seriouslypro.componentmanager.purchase.SupplierPurchase {
     String supplier = 'Farnell'
 }
 

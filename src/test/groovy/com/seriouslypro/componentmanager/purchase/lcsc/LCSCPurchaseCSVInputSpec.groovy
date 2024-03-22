@@ -35,8 +35,8 @@ class LCSCPurchaseCSVInputSpec extends Specification {
         when:
             csvInput.parseHeader()
 
-            csvInput.parseLines { CSVInputContext context, LCSCPurchase componentPlacement, String[] line ->
-                purchases << componentPlacement
+            csvInput.parseLines { CSVInputContext context, LCSCPurchase purchase, String[] line ->
+                purchases << purchase
             }
 
         then:
