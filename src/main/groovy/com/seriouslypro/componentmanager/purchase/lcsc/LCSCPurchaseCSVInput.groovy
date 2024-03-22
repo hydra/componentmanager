@@ -9,12 +9,13 @@ import groovy.transform.ToString
 import java.time.LocalDate
 
 @ToString(includeNames = true, includePackage = false, includeSuperProperties = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 class LCSCPurchase extends SupplierPurchase {
     String supplier = 'LCSC'
 }
 
 @ToString(includeNames = true, includePackage = false)
+@EqualsAndHashCode
 abstract class SupplierPurchase {
     String supplierPart
     String manufacturerPart

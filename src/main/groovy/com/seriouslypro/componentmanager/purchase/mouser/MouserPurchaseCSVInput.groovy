@@ -12,15 +12,17 @@ import java.util.regex.Matcher
 /**
  * Generate CSV from mouser website.
  * "Order History - Part History / Search"
+ * Filter the results by "Sales order number" (maybe open the order history in a new browser tab)
  * Set page to 100 per page, or more if you can.
  * Click "Export this page to Excel" ON EACH PAGE.
  * Save each file to a folder.
- * For each file, load into Excel the save as .CSV.
+ * For each file, load into Excel the save as "CSV UTF-8 (Comma delimited) (*.csv)".  Note: it's important to use UTF-8 so that the currency symbol is exported correctly.
+ * Repeat the search for each order.
  *
  * Point the tool at the folder containing the .CSV files.
  */
 @ToString(includeNames = true, includePackage = false, includeSuperProperties = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 class MouserPurchase extends SupplierPurchase {
     String supplier = 'Mouser'
 }
@@ -30,7 +32,7 @@ enum MouserPurchaseCSVHeaders implements CSVColumn<MouserPurchaseCSVHeaders> {
     MANUFACTURER_PART(["Mfr. Part No."]),
     MANUFACTURER(["Mfr."]),
     DESCRIPTION(["Description"]),
-    QUANTITY(["Qty."]),
+    QUANTITY(["Qty.", "Qty Shipped"]),
     PRICE(["Price"]),
     SALES_ORDER(["Sales Order No."]),
     ORDER_DATE(["Order Date"])
@@ -48,9 +50,12 @@ class MouserPurchaseCSVInput extends CSVInput<MouserPurchase, MouserPurchaseCSVH
         MouserPurchase parse(CSVInputContext context, String[] rowValues) {
 
             String priceWithCurrencySymbol = rowValues[columnIndex(context, MouserPurchaseCSVHeaders.PRICE)]
-            Matcher matcher = priceWithCurrencySymbol =~ /^(?<price>.*) (?<currency>\S)$/
+            Matcher matcher = priceWithCurrencySymbol =~ /^(?<price>.{2,}) +(?<currency>\S{1})$/
             if (!matcher.matches()) {
-                throw new CSVInput.CSVParseException("invalid price format, expected: \"<price> <currencySymbol>\", value: \"$priceWithCurrencySymbol\"")
+                matcher = priceWithCurrencySymbol =~ /^(?<currency>\S{1}) +(?<price>.{2,})$/
+                if (!matcher.matches()) {
+                    throw new CSVInput.CSVParseException("invalid price format, expected: \"<price> <currencySymbol>\" or \"<currencySymbol> <price>\", value: \"$priceWithCurrencySymbol\"")
+                }
             }
             Currency currency = Currency.fromSymbol(Currency, matcher.group('currency'))
             BigDecimal price = matcher.group('price').replace(',', '.') as BigDecimal

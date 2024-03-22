@@ -36,7 +36,7 @@ import java.util.regex.Matcher
  */
 
 @ToString(includeNames = true, includePackage = false, includeSuperProperties = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 class FarnellPurchase extends SupplierPurchase {
     String supplier = 'Farnell'
 }
