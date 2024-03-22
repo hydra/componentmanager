@@ -184,8 +184,16 @@ class PurchaseCSVProcessor {
                     // For now, we repeat this for every purchase, a later refactoring should seek to remove both the switch statements in this method.
                     LCSCDataExtractor lcscDataExtractor = new LCSCDataExtractor(fileName: sourceFile.name)
 
-                    purchase.orderDate = lcscDataExtractor.getOrderDate()
                     purchase.orderNumber = lcscDataExtractor.getOrderNumber()
+                    if (!purchase.orderNumber) {
+                        throw new RuntimeException("Unable to extract order number from filename, ensure the filename is the same as the order number, file: '$sourceFile'")
+                    }
+
+                    purchase.orderDate = lcscDataExtractor.getOrderDate()
+                    if (!purchase.orderDate) {
+                        throw new RuntimeException("Unable to extract order date from filename, ensure the filename is the same as the order number, which should contain a date, e.g. WM2401170052.csv = 2024/01/17, file: '$sourceFile'")
+                    }
+
                     break;
             }
 
