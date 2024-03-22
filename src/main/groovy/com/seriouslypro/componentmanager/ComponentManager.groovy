@@ -3,6 +3,12 @@ package com.seriouslypro.componentmanager
 import groovy.cli.picocli.CliBuilder
 import groovy.cli.picocli.OptionAccessor
 
+/**
+ * This is just a skeleton program and has no functionality.
+ *
+ * @see BOMCost
+ * @see PurchaseCombiner
+ */
 class ComponentManager {
 
     public static void main(String [] args) {
