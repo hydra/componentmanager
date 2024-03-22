@@ -10,16 +10,16 @@ class DigikeyDataExtractorSpec extends Specification {
     @Unroll
     def 'extract date'() {
         given:
-        DigikeyDataExtractor extractor = new DigikeyDataExtractor(fileName: fileName)
+            DigikeyDataExtractor extractor = new DigikeyDataExtractor(fileName: fileName)
 
         expect:
-        extractor.getOrderDate() == expectedOrderDate
+            extractor.getOrderDate() == expectedOrderDate
 
         where:
-        fileName | expectedOrderDate | scenario
-        // Actual real-world data
-        "DK_PRODUCTS_70211052_20210615.csv" | new LocalDate(2021, 06, 15) | "YYYYMMDD 8 digit date format"
-        "DK_PRODUCTS_85805679_20240310.csv" | new LocalDate(2024, 03, 10) | "YYYYMMDD 8 digit date format"
+            fileName                            | expectedOrderDate           | scenario
+            // Actual real-world data
+            "DK_PRODUCTS_70211052_20210615.csv" | new LocalDate(2021, 06, 15) | "YYYYMMDD 8 digit date format"
+            "DK_PRODUCTS_85805679_20240310.csv" | new LocalDate(2024, 03, 10) | "YYYYMMDD 8 digit date format"
     }
 
     @Unroll
@@ -48,15 +48,15 @@ class DigikeyDataExtractorSpec extends Specification {
     @Unroll
     def 'extract order number'() {
         given:
-        DigikeyDataExtractor extractor = new DigikeyDataExtractor(fileName: fileName)
+            DigikeyDataExtractor extractor = new DigikeyDataExtractor(fileName: fileName)
 
         expect:
-        extractor.getOrderNumber() == expectedOrderNumber
+            extractor.getOrderNumber() == expectedOrderNumber
 
         where:
-        fileName | expectedOrderNumber
-        // Actual real-world data
-        "DK_PRODUCTS_70211052_20210615.csv" | "70211052"
-        "DK_PRODUCTS_85805679_20240310.csv" | "85805679"
+            fileName                            | expectedOrderNumber
+            // Actual real-world data
+            "DK_PRODUCTS_70211052_20210615.csv" | "70211052"
+            "DK_PRODUCTS_85805679_20240310.csv" | "85805679"
     }
 }
