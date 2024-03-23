@@ -1,6 +1,6 @@
 # ComponentManager
 
-by Dominic Clifton. (C) 2018-2023
+by Dominic Clifton. (C) 2018-2024
 
 Utilities to manage costing/pricing for PCB assembly.
 

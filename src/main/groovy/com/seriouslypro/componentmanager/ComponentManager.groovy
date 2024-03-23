@@ -29,7 +29,7 @@ class ComponentManager {
     }
 
     private static void about() {
-        System.out.println('ComponentManager (C) 2023 Dominic Clifton')
+        System.out.println('ComponentManager (C) 2023-2024 Dominic Clifton')
         System.out.println('Written by Dominic Clifton')
     }
 }
