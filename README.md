@@ -50,6 +50,7 @@ The tools in this project seeks to reduce your workload by:
 * LCSC
 * Mouser
 * Farnell
+* Digikey
 
 Supported for other suppliers is planned.
 Adding a supplier support is reasonably straightforward though as long as the supplier's website allows you to export one
