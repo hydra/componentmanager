@@ -64,8 +64,10 @@ so YMMV if you try to use their APIs... See developer notes in the code for exam
 ## Workflow
 
 The workflow is currently:
-1) export your past purchases (orders) from supported suppliers (e.g. LCSC) into supported input formats (e.g. CSV) 
-2) create a `.json` client credentials file to allow the tool to access google sheets
+
+1) Export your past purchases (orders) from supported suppliers (e.g. LCSC) into supported input formats (e.g. CSV) 
+
+2) Create a `.json` client credentials file to allow the tool to access google sheets
 
 Get credentials from the Google API Console, steps:
 * Click 'APIs and Services'
@@ -78,7 +80,7 @@ Reference 2: https://console.cloud.google.com/apis/credentials/oauthclient
 
 Example URL: https://console.cloud.google.com/welcome?pli=1&project=component-manager-319920
 
-3) create a per-user config file for the tool, so it can access google sheets via the API.
+3) Create a per-user config file for the tool, so it can access google sheets via the API.
 
 ```
 sheetId=1DyAAXeNf1tS25ZWaWHjedyReiUt_goo17hTRhCHcDsQ
@@ -89,7 +91,7 @@ store as `configs/user.config`
 
 The sheetId is the ID of the purchase history spreadsheet that the tool will update.
 
-3) create a config file so you don't have to remember all the command line arguments every time you run the tool:
+3) Create a config file so you don't have to remember all the command line arguments every time you run the tool:
 
 ```
 -u
@@ -99,14 +101,14 @@ The sheetId is the ID of the purchase history spreadsheet that the tool will upd
 -sd "D:\\My Documents\\Purchasing\\Farnell\\Orders"
 ```
 
-store as `@configs\user.purchasecombiner`
+Store as `@configs\user.purchasecombiner`.
 
 Refer to [command line arguments](#command-line-arguments) below.
 
-Note: The tool only works with one source directory at a time, enable/disable the source directory
-argument as appropriate by adding/removing the `#` prefix an re-running the tool.
+Note: The tool can work with multiple source directories, enable/disable the source directory
+arguments as appropriate by adding/removing the `#` prefix and re-running the tool.
 
-4) run PurchaseCombiner to update a purchase history spreadsheet (e.g. on google sheets via the Google Sheets API) 
+4) Run PurchaseCombiner to update a purchase history spreadsheet (e.g. on google sheets via the Google Sheets API) 
 note: currently running purchase combiner multiple times will create duplicate rows in the spreadsheet but is non-destructive, 
 recommended to use version control on the generated file so that it can be reverted if required.
 when using google sheets export you can enable version history for the file in google sheets.
@@ -114,8 +116,8 @@ when using google sheets export you can enable version history for the file in g
 ```
 purchasecombiner @configs\user.purchasecombiner
 ```
- 
-5) manually append line items to the spreadsheet for purchases from unsupported suppliers.
+
+5) Manually append line items to the spreadsheet for purchases from unsupported suppliers.
 
 6) Export BOM from EDA tool (DipTrace)
 
@@ -125,24 +127,28 @@ purchasecombiner @configs\user.purchasecombiner
 
 save as CSV file, e.g. `DesignName-RevA-YYYYMMDD-HHMM-BOM.csv`
 
-7) create Name + Value to Name + Value part substitutions spreadsheet in google sheets or a CSV file for the project (design specific substitutions)
+7) Create Name Pattern + Value Pattern to Name + Value part substitutions spreadsheet in google sheets or a CSV file for the project (design specific substitutions)
+
+Regular expressions are supported in the patterns.  You can use online regular expression tools, like [regex101.com](http://regex101.com), to test your regular expressions.
 
 e.g.
 ```csv
-"Name";"Value";"Name";"Value"
+"Name Pattern";"Value Pattern";"Name";"Value"
 "CAP_0402";"2.2uF 6.3V 0402";"CAP_0402";"2.2uF 10V 0402 X5R 10%"
+"LED 0603 RED 250MCD";"/.*/";"LED 0603 RED",""
 ```
 
-8) create Name + Value to Order-code & Manufacturer substitutions spreadsheet in google sheets or a CSV file for each component to be used. (an EDA to order-code mapping)
+8) Create Name + Value to Order-code & Manufacturer substitutions spreadsheet in google sheets or a CSV file for each component to be used. (an EDA to order-code mapping)
 
-Regular expressions are supported in the patterns.
+Regular expressions are supported in the patterns here too.
+
 ```csv
 "Name Pattern";"Value Pattern";"Part Code";"Manufacturer"
 "CAP_0402";"2.2uF 10V 0402 X5R 10%";"CL05A225KP5NSNC";"Samsung Electro-Mechanics"
 "SM04B-SRSS-TB";"/.*/";"AFC10-S04QCC-00";"JUSHUO"
 ```
 
-9) create a per-design config file for the tool so it can find all the files.
+9) Create a per-design config file for the tool so it can find all the files.
 
 ```
 -c
@@ -157,11 +163,15 @@ save as `configs/DesignName-RevA-YYYYMMDD-HHMM-BOM.bomcost`
 
 Refer to [command line arguments](#command-line-arguments) below.
 
-10) run BOMCost to calculate the cost for the BOM, tell it to get the program arguments from a file using the `@` symbol:
+10) Run BOMCost to calculate the cost for the BOM, tell it to get the program arguments from a file using the `@` symbol:
 
 `bomcost @configs/DesignName-RevA-YYYYMMDD-HHMM-BOM.bomcost`
 
-it will print out the costs of previously-ordered parts and sum the currencies used.
+It will print out the costs of previously-ordered parts and sum the currencies used.
+
+It applies part substitutions first, then searches the part mappings to find the part and its price by using the manufacturer's part number.
+If there are more than one possible substitution it will use the first one encountered, you can re-order substitutions in the part substitution file as you prefer.
+
 e.g.
 
 ```
@@ -176,28 +186,29 @@ SOLDER_PAD, , [SP7, SP8]
 Cost: [USD:9.9999, EUR:8.8888, GBP:7.7777]
 ```
 
-the resulting CSV file will contain data like this 
+The resulting CSV file will contain data like this:
 ```csv
 "REFDES", "NAME","VALUE","SUBSTITUTE_NAME","SUBSTITUTE_VALUE","MANUFACTURER","PART_CODE","SUPPLIER","ORDER_REFERENCE","ORDER_DATE","QUANTITY","UNIT_PRICE","LINE_PRICE","CURRENCY"
 "C1, C2","CAP_0402","2.2uF 6.3V 0402","CAP_0402","2.2uF 10V 0402 X5R 10%","Samsung Electro-Mechanics","CL05A225KP5NSNC","LCSC","2020101AAAA","2020-01-01","3","0.0034","0.0102","USD"
 ```
 
-it's also possible to then:
+It's also possible to then:
 
-11) check your inventory against the selected BOM components.
-12) order new/out-of-stock parts, sometimes by uploading the resulting 'bom-cost.csv' to a supplier.
+11) Check your inventory against the selected BOM components.
+12) Order new/out-of-stock parts, sometimes by uploading the resulting 'bom-cost.csv' to a supplier.
 
 ## Limitations
 
 PurchaseCombiner
- * Doesn't handle duplicates and just inserts rows, see workflow.
- - Digikey and Arrow support is planned.
+ * Doesn't handle duplicates and just inserts rows, see workflow.  Ensure you don't attempt to re-import order files; However, reverting a Google sheets file using revision history is easy.
+ - Arrow support is planned.
  + It's still much quicker than doing it manually.
  
 BOMCost
- - Work-in-progress.
+ - None, it's functional now.
 
 ## Building
+
 Requires 'pnpconvert' as a sibling to the 'componentmanager' directory so that gradle can find it.
 
 ## Testing
@@ -209,6 +220,7 @@ Requires 'pnpconvert' as a sibling to the 'componentmanager' directory so that g
 `gradlew installDist`
 
 ## Running
+
 Only from IDE at the moment.  Run `main()` in BOMCost.groovy or PurchaseCombiner.groovy
 
 ## Command line arguments
