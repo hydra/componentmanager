@@ -96,8 +96,6 @@ class BOMCostCalculator {
 
         BOMCostResult result = new BOMCostResult()
 
-        List<BOMItemOption> unmatchedBomItemOptions = []
-
         bomItemOptions.eachWithIndex { BOMItemOption bomItemOption, int i ->
             Optional<Purchase> optionalPurchase = findPurchase(purchases, bomItemOption)
 
