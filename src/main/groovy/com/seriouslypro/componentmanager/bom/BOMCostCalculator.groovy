@@ -1,21 +1,20 @@
 package com.seriouslypro.componentmanager.bom
 
-import com.seriouslypro.componentmanager.currency.Currency
+
 import com.seriouslypro.componentmanager.purchase.Purchase
 import com.seriouslypro.componentmanager.purchase.PurchaseCSVInput
 import com.seriouslypro.csv.CSVInput
 import com.seriouslypro.csv.CSVInputContext
 import com.seriouslypro.eda.BOMItem
 import com.seriouslypro.eda.BOMItemOption
+import com.seriouslypro.eda.diptrace.bom.BOMItemOptionsPartMapper
 import com.seriouslypro.eda.diptrace.bom.DipTraceBOMCSVInput
-import com.seriouslypro.eda.part.PartMapper
+import com.seriouslypro.eda.part.PartMappings
 import com.seriouslypro.eda.part.PartMapping
 import com.seriouslypro.eda.part.PartSubstitution
 import com.seriouslypro.eda.part.PartSubstitutor
 import com.seriouslypro.pnpconvert.FileTools
 import groovy.transform.ToString
-
-import java.time.format.DateTimeFormatter
 
 interface BOMItemMatchingStrategy {
     boolean matches(Purchase candidate, BOMItem bomItem)
@@ -49,7 +48,7 @@ class BOMCostCalculator {
     String edaPartMappingsFileName
     String edaSubstitutionsFileName
 
-    PartMapper partMapper = new PartMapper()
+    PartMappings partMapper = new PartMappings()
     PartSubstitutor partSubstitutor = new PartSubstitutor()
 
     List<BOMItemMatchingStrategy> itemMatchingStrategies = [
@@ -81,7 +80,7 @@ class BOMCostCalculator {
             List<PartSubstitution> partSubstitutions = partSubstitutor.findSubstitutions(bomItem)
             BOMItem substitute = chooseAndBuildSubstitute(bomItem, partSubstitutions)
 
-            List<PartMapping> options = partMapper.buildOptions(substitute)
+            List<PartMapping> options = new BOMItemOptionsPartMapper().buildOptions(partMapper.partMappings, substitute)
             bomItemOptions << new BOMItemOption(originalItem: bomItem, item: substitute, options: options)
         }
 

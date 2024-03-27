@@ -1,17 +1,15 @@
-package com.seriouslypro.eda.part
+package com.seriouslypro.eda.diptrace.bom
 
 import com.seriouslypro.eda.BOMItem
+import com.seriouslypro.eda.part.PartMapping
 import spock.lang.Specification
 import spock.lang.Unroll
 
-class PartMapperSpec extends Specification {
+class BOMItemOptionsPartMapperSpec extends Specification {
 
     def 'buildOption for empty item'() {
-        given:
-            BOMItem bomItem = new BOMItem()
-
         when:
-            List<PartMapping> options = new PartMapper().buildOptions(bomItem)
+            List<PartMapping> options = new BOMItemOptionsPartMapper().buildOptions([], new BOMItem())
 
         then:
             options == []
@@ -30,7 +28,7 @@ class PartMapperSpec extends Specification {
             ]
 
         when:
-            List<PartMapping> options = new PartMapper(partMappings: partMappings).buildOptions(bomItem)
+            List<PartMapping> options = new BOMItemOptionsPartMapper().buildOptions(partMappings, bomItem)
 
         then:
             options == expectedOptions
@@ -61,7 +59,7 @@ class PartMapperSpec extends Specification {
             ]
 
         when:
-            List<PartMapping> options = new PartMapper(partMappings: partMappings).buildOptions(bomItem)
+            List<PartMapping> options = new BOMItemOptionsPartMapper().buildOptions(partMappings, bomItem)
 
         then:
             options == expectedOptions
