@@ -5,6 +5,10 @@ buildscript {
         maven { url 'https://plugins.gradle.org/m2/' }
         jcenter()
     }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-clover-plugin:3.0.1'
+    }
 }
 
 plugins {
@@ -14,9 +18,11 @@ plugins {
     id 'application'
 }
 
-version '1.0.0'
+apply plugin: 'com.bmuschko.clover'
 
 mainClassName = 'com.seriouslypro.componentmanager.ComponentManager'
+
+version '1.0.0'
 
 repositories {
     mavenLocal()
@@ -62,6 +68,8 @@ dependencies {
     implementation 'com.google.apis:google-api-services-sheets:v4-rev20230227-2.0.0'
 
     implementation project(":pnpconvert")
+
+    clover 'org.openclover:clover:4.5.2'
 }
 
 test {
@@ -73,5 +81,21 @@ test {
                 throw new IllegalStateException("No tests were found. Failing the build")
             }
         }
+    }
+}
+
+clover {
+    // https://github.com/bmuschko/gradle-clover-plugin
+    testIncludes = ['**/*Spec.groovy']
+    excludes = [
+        // All the following cause: java.lang.UnsupportedOperationException: EmptyExpression.INSTANCE is immutable"
+    ]
+    testExcludes = [
+        // All the following cause: java.lang.UnsupportedOperationException: EmptyExpression.INSTANCE is immutable"
+    ]
+
+    report {
+        html = true
+        xml = true
     }
 }
