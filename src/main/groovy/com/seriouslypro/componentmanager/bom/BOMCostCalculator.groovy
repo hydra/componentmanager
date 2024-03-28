@@ -10,10 +10,10 @@ import com.seriouslypro.eda.BOMItemOption
 import com.seriouslypro.eda.diptrace.bom.BOMItemOptionsPartMapper
 import com.seriouslypro.eda.diptrace.bom.DipTraceBOMCSVInput
 import com.seriouslypro.eda.part.BOMItemPartSubstitutor
-import com.seriouslypro.eda.part.PartMappings
+import com.seriouslypro.eda.part.PartMappingsLoader
 import com.seriouslypro.eda.part.PartMapping
 import com.seriouslypro.eda.part.PartSubstitution
-import com.seriouslypro.eda.part.PartSubstitutor
+import com.seriouslypro.eda.part.PartSubstitutionsLoader
 import com.seriouslypro.pnpconvert.FileTools
 import groovy.transform.ToString
 
@@ -49,8 +49,8 @@ class BOMCostCalculator {
     String edaPartMappingsFileName
     String edaSubstitutionsFileName
 
-    PartMappings partMapper = new PartMappings()
-    PartSubstitutor partSubstitutor = new PartSubstitutor()
+    PartMappingsLoader partMapper = new PartMappingsLoader()
+    PartSubstitutionsLoader partSubstitutionsLoader = new PartSubstitutionsLoader()
     BOMItemPartSubstitutor bomPartSubstitutor = new BOMItemPartSubstitutor()
 
     List<BOMItemMatchingStrategy> itemMatchingStrategies = [
@@ -68,7 +68,7 @@ class BOMCostCalculator {
         }
 
         if (edaSubstitutionsFileName) {
-            partSubstitutor.loadFromCSV(edaSubstitutionsFileName)
+            partSubstitutionsLoader.loadFromCSV(edaSubstitutionsFileName)
         }
 
         Reader bomReader = FileTools.openFileOrUrl(bomFileName)
@@ -79,7 +79,7 @@ class BOMCostCalculator {
         bomCSVInput.parseHeader()
         bomCSVInput.parseLines { CSVInputContext context, BOMItem bomItem, String[] line ->
 
-            List<PartSubstitution> partSubstitutions = bomPartSubstitutor.findSubstitutions(partSubstitutor.partSubstitutions, bomItem)
+            List<PartSubstitution> partSubstitutions = bomPartSubstitutor.findSubstitutions(partSubstitutionsLoader.partSubstitutions, bomItem)
             BOMItem substitute = chooseAndBuildSubstitute(bomItem, partSubstitutions)
 
             List<PartMapping> options = new BOMItemOptionsPartMapper().buildOptions(partMapper.partMappings, substitute)
