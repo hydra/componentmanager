@@ -9,6 +9,7 @@ import com.seriouslypro.eda.BOMItem
 import com.seriouslypro.eda.BOMItemOption
 import com.seriouslypro.eda.diptrace.bom.BOMItemOptionsPartMapper
 import com.seriouslypro.eda.diptrace.bom.DipTraceBOMCSVInput
+import com.seriouslypro.eda.part.BOMItemPartSubstitutor
 import com.seriouslypro.eda.part.PartMappings
 import com.seriouslypro.eda.part.PartMapping
 import com.seriouslypro.eda.part.PartSubstitution
@@ -50,6 +51,7 @@ class BOMCostCalculator {
 
     PartMappings partMapper = new PartMappings()
     PartSubstitutor partSubstitutor = new PartSubstitutor()
+    BOMItemPartSubstitutor bomPartSubstitutor = new BOMItemPartSubstitutor()
 
     List<BOMItemMatchingStrategy> itemMatchingStrategies = [
         new NameOnlyItemMatchingStrategy()
@@ -77,7 +79,7 @@ class BOMCostCalculator {
         bomCSVInput.parseHeader()
         bomCSVInput.parseLines { CSVInputContext context, BOMItem bomItem, String[] line ->
 
-            List<PartSubstitution> partSubstitutions = partSubstitutor.findSubstitutions(bomItem)
+            List<PartSubstitution> partSubstitutions = bomPartSubstitutor.findSubstitutions(partSubstitutor.partSubstitutions, bomItem)
             BOMItem substitute = chooseAndBuildSubstitute(bomItem, partSubstitutions)
 
             List<PartMapping> options = new BOMItemOptionsPartMapper().buildOptions(partMapper.partMappings, substitute)
@@ -121,7 +123,7 @@ class BOMCostCalculator {
 
         PartSubstitution selectedSubstitution = partSubstitutions.first()
 
-        BOMItem substitute = partSubstitutor.buildSubstitute(bomItem, selectedSubstitution)
+        BOMItem substitute = bomPartSubstitutor.buildSubstitute(bomItem, selectedSubstitution)
 
         return substitute
     }
