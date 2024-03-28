@@ -1,8 +1,7 @@
 package com.seriouslypro.componentmanager.purchasecombiner
 
 import com.seriouslypro.test.TestResources
-import org.junit.rules.TemporaryFolder
-import org.springframework.boot.test.OutputCapture
+import io.github.joke.spockoutputcapture.OutputCapture
 import spock.lang.Specification
 
 /**
@@ -14,8 +13,7 @@ import spock.lang.Specification
  */
 class PurchaseCombinerSpec extends Specification implements TestResources {
 
-    @org.junit.Rule
-    OutputCapture capture = new OutputCapture()
+    @OutputCapture capture
 
     void setup() {
         System.out.flush()

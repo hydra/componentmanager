@@ -1,14 +1,12 @@
 package com.seriouslypro.componentmanager.bom
 
-
 import com.seriouslypro.test.TestResources
-import org.springframework.boot.test.OutputCapture
+import io.github.joke.spockoutputcapture.OutputCapture
 import spock.lang.Specification
 
 class BOMCostSpec extends Specification implements TestResources {
 
-    @org.junit.Rule
-    OutputCapture capture = new OutputCapture()
+    @OutputCapture capture
 
     void setup() {
         System.out.flush()
